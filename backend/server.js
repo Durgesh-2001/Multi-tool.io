@@ -24,8 +24,33 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Middleware
-app.use(cors());
+// --- Middleware ---
+
+// ✨ Production-Ready CORS Configuration
+const allowedOrigins = [
+  'https://testing.vercel.app',
+  'http://localhost:5173',
+  'http://localhost:74'
+];
+
+const corsOptions = {
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps, curl requests)
+    // or if the origin is in the whitelist.
+    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true, // This allows cookies to be sent with requests
+  optionsSuccessStatus: 200 // For legacy browser compatibility
+};
+
+app.use(cors(corsOptions));
+// --- End of CORS Configuration ---
+
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -80,6 +105,11 @@ app.use((err, req, res, next) => {
     }
   }
   
+  // Handle CORS errors specifically
+  if (err.message === 'Not allowed by CORS') {
+      return res.status(403).json({ error: 'Access denied by CORS policy.' });
+  }
+
   res.status(500).json({ error: 'Something went wrong!', details: err.message });
 });
 
@@ -90,4 +120,4 @@ app.use('*', (_req, res) => {
 
 app.listen(PORT, () => {
   console.log(`🚀 Multi-Tool.io Server running at http://localhost:${PORT}`);
-}); 
+});
