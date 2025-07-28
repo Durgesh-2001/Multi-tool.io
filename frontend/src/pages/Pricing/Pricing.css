@@ -1,0 +1,159 @@
+/* Pricing page specific styles (optional) */
+
+.pricing-page {
+  background: #f6f6f7;
+  min-height: 100vh;
+  padding-bottom: 3rem;
+}
+
+.plans-view {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2.5rem 2rem;
+  justify-content: center;
+  max-width: 1100px;
+  margin: 0 auto;
+  margin-top: 2.5rem;
+}
+
+@media (max-width: 1100px) {
+  .plans-view {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2rem 1.2rem;
+  }
+}
+@media (max-width: 700px) {
+  .plans-view {
+    grid-template-columns: 1fr;
+    gap: 1.2rem;
+  }
+}
+
+.plan-card-new {
+  background: #fff;
+  border-radius: 18px;
+  border: 1.5px solid #e5e7eb;
+  min-width: 260px;
+  max-width: 320px;
+  min-height: 420px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  padding: 2.2rem 2rem 2rem 2rem;
+  position: relative;
+  transition: box-shadow 0.2s, border 0.2s, transform 0.2s;
+  margin: 0 auto;
+  text-align: left;
+  box-shadow: 0 2px 8px 0 rgba(0,0,0,0.04);
+}
+
+.plan-card-new.highlight {
+  border: 2.5px solid #16a34a;
+  z-index: 2;
+}
+
+.plan-card-new .tag {
+  position: absolute;
+  top: 0.7rem;
+  right: 0.7rem;
+  background: #16a34a;
+  color: #fff;
+  padding: 2px 10px;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 8px rgba(22,163,74,0.12);
+  z-index: 3;
+}
+
+.plan-card-new h3 {
+  color: inherit;
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.price-new {
+  font-size: 2.1rem;
+  font-weight: 800;
+  margin-bottom: 0.2rem;
+  color: inherit;
+  text-align: left;
+}
+
+.slashed-price-animated {
+  text-decoration: line-through;
+  margin-left: 0.7rem;
+  font-size: 1.1rem;
+  color: #bdbdbd;
+  font-weight: 500;
+}
+
+.plan-card-new hr {
+  border: none;
+  border-top: 1px solid #e5e7eb;
+  margin: 1.2rem 0 1.2rem 0;
+}
+
+.features-new {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1.5rem 0;
+  width: 100%;
+  text-align: left;
+  color: inherit;
+}
+
+.features-new li {
+  font-size: 1.08rem;
+  line-height: 2.1rem;
+  padding-left: 0;
+  margin-bottom: 0.1rem;
+  border-left: none;
+  background: transparent;
+  min-height: 2.1rem;
+  position: relative;
+  color: inherit;
+}
+
+.features-new li:last-child {
+  margin-bottom: 0;
+}
+
+.plan-btn-new {
+  background: #111;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.7rem 0;
+  font-weight: 700;
+  cursor: pointer;
+  margin: 1.5rem 0 0.5rem 0;
+  font-size: 1.1rem;
+  width: 100%;
+  box-shadow: 0 1px 4px rgba(22,163,74,0.08);
+  transition: background 0.2s, box-shadow 0.2s;
+}
+
+.plan-btn-new:hover {
+  background: #16a34a;
+  color: #fff;
+}
+
+.pricing-page.dark .plan-card-new,
+.plan-card-new.dark {
+  background: #23272f;
+  color: #fff;
+  border-color: #333;
+}
+
+.pricing-page.dark .plan-card-new .tag,
+.plan-card-new.dark .tag {
+  background: #16a34a;
+  color: #fff;
+}
+
+.pricing-page.dark .slashed-price-animated {
+  color: #888;
+} 

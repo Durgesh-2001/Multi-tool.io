@@ -1,0 +1,337 @@
+/* Overlay */
+.modal-overlay-new {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 1000;
+}
+
+/* Modal Content */
+.modal-content-new {
+  background: white;
+  max-width: 900px;
+  width: 95%;
+  padding: 2rem;
+  border-radius: 1rem;
+  position: relative;
+  overflow-y: auto;
+  max-height: 90vh;
+  box-shadow: 0 0 15px rgba(0,0,0,0.2);
+  transition: all 0.3s ease-in-out;
+}
+
+.modal-content-new.dark {
+  background: #1f2937;
+  color: #fff;
+}
+
+/* Header */
+.modal-header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 1rem;
+  position: relative;
+}
+
+.modal-header h2 {
+  font-size: 1.6rem;
+  font-weight: 600;
+}
+
+/* Close button (top right) */
+.close-button-new {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+/* Back button (also top right, but left of close) */
+.back-button {
+  position: absolute;
+  top: 1rem;
+  right: 3.5rem;
+  padding: 6px 12px;
+  background: #e5e7eb;
+  border: none;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+/* Plan Grid */
+.plans-view {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: stretch;
+  gap: 2rem;
+  margin-top: 2.5rem;
+  flex-wrap: wrap;
+}
+
+/* Plan Card */
+.plan-card-new {
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 4px 32px 0 rgba(0,0,0,0.10), 0 1.5px 6px 0 rgba(0,0,0,0.04);
+  border: 2px solid #e5e7eb;
+  min-width: 260px;
+  max-width: 320px;
+  min-height: 420px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  padding: 2.2rem 2rem 2rem 2rem;
+  position: relative;
+  transition: box-shadow 0.2s, border 0.2s, transform 0.2s;
+}
+
+.plan-card-new:hover {
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  transform: translateY(-3px);
+}
+
+.plan-card-new.highlight {
+  border: 2.5px solid #16a34a;
+  box-shadow: 0 8px 32px 0 rgba(22,163,74,0.18), 0 4px 16px 0 rgba(0,0,0,0.10);
+  z-index: 2;
+}
+
+.plan-card-new .tag {
+  position: absolute;
+  top: 1.2rem;
+  left: 1.2rem;
+  background: #16a34a;
+  color: #fff;
+  padding: 5px 14px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 8px rgba(22,163,74,0.12);
+}
+
+.plan-card-new h3 {
+  font-size: 1.35rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: #111827;
+  text-align: left;
+}
+
+.price-new {
+  font-size: 2.1rem;
+  font-weight: 800;
+  margin-bottom: 0.2rem;
+  color: #16a34a;
+  text-align: left;
+}
+
+.slashed-price-animated {
+  text-decoration: line-through;
+  margin-left: 0.7rem;
+  font-size: 1.1rem;
+  color: #bdbdbd;
+  font-weight: 500;
+}
+
+/* Button */
+.plan-btn-new {
+  background: #16a34a;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.7rem 0;
+  font-weight: 700;
+  cursor: pointer;
+  margin: 1.5rem 0 0.5rem 0;
+  font-size: 1.1rem;
+  width: 100%;
+  box-shadow: 0 1px 4px rgba(22,163,74,0.08);
+  transition: background 0.2s, box-shadow 0.2s;
+}
+
+.plan-btn-new:hover {
+  background: #15803d;
+  box-shadow: 0 2px 8px rgba(22,163,74,0.16);
+}
+
+/* Features */
+.features-new {
+  list-style: none;
+  padding: 0;
+  margin: 1.5rem 0 0 0;
+  width: 100%;
+  text-align: left;
+}
+
+.features-new li {
+  font-size: 1.08rem;
+  line-height: 2.1rem;
+  padding-left: 0;
+  margin-bottom: 0.1rem;
+  border-left: none;
+  background: transparent;
+  min-height: 2.1rem;
+  position: relative;
+  color: #222;
+}
+
+.features-new li:last-child {
+  margin-bottom: 0;
+}
+
+/* Subscription Management Box */
+.subscription-management {
+  grid-column: span 2;
+  padding: 1rem;
+  background: #fff0f0;
+  border: 1px solid #f87171;
+  border-radius: 0.8rem;
+  margin-bottom: 1rem;
+}
+
+/* Cancel Button */
+.cancel-btn {
+  background: #ef4444;
+  color: white;
+  border: none;
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-top: 0.5rem;
+}
+
+/* Payment View */
+.payment-view {
+  text-align: center;
+  padding: 1rem 0;
+}
+
+.payment-amount {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin: 1rem 0;
+}
+
+.payment-method-selector {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin: 1rem 0;
+}
+
+.payment-btn-new {
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  border: none;
+  background: #16a34a;
+  color: white;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.2s ease;
+}
+
+.payment-btn-new.secondary {
+  background: #2563eb;
+}
+
+.payment-btn-new:hover {
+  filter: brightness(1.05);
+}
+
+/* QR Code View */
+.qr-payment-new {
+  margin-top: 1.2rem;
+}
+
+.qr-payment-new p {
+  margin-top: 1rem;
+  font-size: 0.95rem;
+}
+
+/* Test Card */
+.test-card-info-new {
+  margin-top: 1rem;
+  font-size: 0.85rem;
+  color: #555;
+  font-style: italic;
+}
+
+/* Flip Card Animation */
+.flip-card-container {
+  perspective: 1000px;
+  width: 320px;
+  height: 200px;
+}
+
+.flip-card {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transition: transform 0.6s cubic-bezier(0.4,0.2,0.2,1);
+  transform-style: preserve-3d;
+}
+
+.flip-card.flipped {
+  transform: rotateY(180deg);
+}
+
+.flip-card-front, .flip-card-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  border-radius: 18px;
+  overflow: hidden;
+}
+
+.flip-card-back {
+  transform: rotateY(180deg);
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+  .plans-view {
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+  }
+  .plan-card-new {
+    min-width: 220px;
+    max-width: 100%;
+    min-height: 340px;
+    padding: 2rem 1.2rem 1.2rem 1.2rem;
+  }
+}
+@media (max-width: 768px) {
+  .plans-view {
+    flex-direction: column;
+    align-items: center;
+    gap: 1.2rem;
+  }
+  .plan-card-new {
+    min-width: 100%;
+    max-width: 100%;
+    min-height: 320px;
+    padding: 1.2rem 0.7rem 1rem 0.7rem;
+  }
+
+  .back-button {
+    right: 3rem;
+    top: 0.8rem;
+  }
+
+  .close-button-new {
+    right: 1rem;
+    top: 0.8rem;
+  }
+}

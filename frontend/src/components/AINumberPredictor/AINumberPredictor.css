@@ -1,0 +1,232 @@
+/* Reset and base */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: #f3f4f6;
+  color: #1f2937;
+}
+
+/* Container card */
+.ai-number-predictor-card {
+  max-width: 500px;
+  margin: 50px auto;
+  padding: 2rem;
+  background: white;
+  border-radius: 1rem;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+}
+
+/* Header */
+.ai-number-predictor-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.ai-number-predictor-icon {
+  font-size: 1.8rem;
+}
+
+.ai-number-predictor-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #4a148c;
+}
+
+/* Description */
+.ai-number-predictor-desc {
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin-bottom: 1.5rem;
+  color: #555;
+}
+
+/* Form */
+.ai-number-predictor-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.ai-number-predictor-input {
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  border: 2px solid #d1d5db;
+  border-radius: 8px;
+  transition: border-color 0.3s;
+}
+
+.ai-number-predictor-input:focus {
+  border-color: #7c3aed;
+  outline: none;
+}
+
+/* Buttons */
+.ai-number-predictor-btn {
+  padding: 0.6rem 1rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.ai-number-predictor-btn:not(.reset) {
+  background-color: #4f46e5;
+  color: #fff;
+}
+
+.ai-number-predictor-btn:not(.reset):hover {
+  background-color: #4338ca;
+}
+
+.ai-number-predictor-btn.reset {
+  background-color: #e11d48;
+  color: #fff;
+  margin-top: 0.5rem;
+}
+
+.ai-number-predictor-btn.reset:hover {
+  background-color: #be123c;
+}
+
+/* Error */
+.ai-number-predictor-error {
+  color: #dc2626;
+  background-color: #fee2e2;
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+}
+
+/* Steps animation */
+.ai-number-predictor-steps {
+  margin-top: 1rem;
+}
+
+.ai-number-predictor-step {
+  padding: 0.5rem 0.75rem;
+  background-color: #ede9fe;
+  color: #4c1d95;
+  border-left: 4px solid #7c3aed;
+  margin-bottom: 0.4rem;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  animation: fadeIn 0.6s ease-in-out;
+}
+
+/* Matrix effect */
+.ai-matrix-container {
+  margin-top: 1.5rem;
+  background: black;
+  border-radius: 8px;
+  padding: 1rem;
+  overflow: hidden;
+}
+
+.ai-matrix-effect {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.ai-matrix-col {
+  color: #0f0;
+  font-family: 'Courier New', Courier, monospace;
+  white-space: pre;
+  font-size: 0.9rem;
+  animation: matrixRain 1.5s infinite alternate;
+}
+
+@keyframes matrixRain {
+  from {
+    transform: translateY(-10%);
+    opacity: 0.6;
+  }
+  to {
+    transform: translateY(10%);
+    opacity: 1;
+  }
+}
+
+/* Chart */
+.ai-chart-container {
+  margin-top: 1rem;
+}
+
+.ai-confidence-chart {
+  text-align: center;
+}
+
+.ai-confidence-label {
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+svg text {
+  font-family: 'Segoe UI', sans-serif;
+}
+
+/* Result */
+.ai-number-predictor-result {
+  margin-top: 2rem;
+  background: #e0f2f1;
+  padding: 1rem;
+  border-radius: 10px;
+  text-align: center;
+  animation: scaleFade 0.6s ease-in-out;
+}
+
+.ai-result-label {
+  font-size: 1rem;
+  font-weight: bold;
+  color: #004d40;
+}
+
+.ai-result-number {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #00796b;
+  display: block;
+  margin: 0.5rem 0;
+}
+
+.ai-number-predictor-wait {
+  margin-top: 1rem;
+  font-style: italic;
+  color: #6366f1;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes scaleFade {
+  0% {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}

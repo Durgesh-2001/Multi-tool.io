@@ -1,0 +1,266 @@
+/* Login.css */
+.auth-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.auth-form {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  padding: 30px;
+  border-radius: 20px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+  animation: fadeInUp 0.5s ease;
+  color: #1a1a1a;
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity 0.5s, transform 0.5s;
+}
+.auth-form.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.auth-form.dark {
+  background: rgba(0, 0, 0, 0.4);
+  color: #f0f0f0;
+}
+
+.auth-form h2 {
+  text-align: center;
+  font-size: 1.8rem;
+  margin-bottom: 25px;
+  font-weight: 600;
+  color: inherit;
+}
+
+.form-group {
+  margin-bottom: 20px;
+  position: relative;
+}
+
+.form-group label {
+  display: block;
+  font-size: 0.95rem;
+  margin-bottom: 6px;
+  color: inherit;
+  font-weight: 500;
+}
+
+.auth-form label,
+.form-group label {
+  margin-bottom: 10px;
+}
+[data-theme='dark'] .auth-form label,
+[data-theme='dark'] .form-group label {
+  margin-bottom: 12px;
+}
+
+.password-group label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-weight: 500;
+  font-size: 0.95rem;
+  color: inherit;
+  margin-bottom: 6px;
+  gap: 8px;
+}
+
+.password-toggle {
+  background: none;
+  border: none;
+  font-size: 1.1rem;
+  color: inherit;
+  margin-left: 8px;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  line-height: 1;
+}
+
+.auth-form input {
+  width: 100%;
+  padding: 12px 14px;
+  border: none;
+  border-radius: 8px;
+  outline: none;
+  font-size: 0.95rem;
+  transition: 0.3s;
+  background-color: rgba(255, 255, 255, 0.9);
+  color: #1a1a1a;
+}
+.auth-form.dark input {
+  background-color: rgba(20, 20, 20, 0.9);
+  color: #f0f0f0;
+}
+.auth-form input:focus {
+  box-shadow: 0 0 0 2px #6e8efb;
+}
+
+.auth-btn,
+.send-otp-button,
+.resend-otp-button {
+  width: 100%;
+  padding: 12px;
+  background: var(--accent-color);
+  color: white;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: all 0.3s ease;
+}
+.auth-btn:hover,
+.send-otp-button:hover,
+.resend-otp-button:hover {
+  background: var(--button-hover);
+}
+
+.divider {
+  margin: 20px 0;
+  position: relative;
+  background: none;
+}
+.divider::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  height: 1px;
+  width: 100%;
+  background: var(--border-color);
+  transform: translateY(-50%);
+  z-index: 0;
+}
+
+.toggle-auth {
+  text-align: center;
+  margin-top: 15px;
+  color: inherit;
+  font-weight: 500;
+}
+.toggle-auth span {
+  color: inherit;
+  font-weight: bold;
+  cursor: pointer;
+  text-decoration: underline;
+  margin-left: 4px;
+  transition: color 0.2s;
+}
+.toggle-auth span:hover {
+  color: #6e8efb;
+}
+
+.login-method-toggle {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  background: transparent;
+}
+
+.login-method-toggle button {
+  flex: 1;
+  padding: 10px;
+  margin: 0 5px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s;
+  background-color: rgba(255, 255, 255, 0.4);
+  color: #333;
+}
+
+.auth-form.dark .login-method-toggle button {
+  background-color: rgba(0, 0, 0, 0.4);
+  color: #f0f0f0;
+}
+
+.login-method-toggle button.active {
+  background: var(--accent-color);
+  color: #fff;
+}
+
+.error-message,
+.success-message {
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: opacity 0.4s, transform 0.4s;
+}
+.error-message.show,
+.success-message.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.error-message {
+  background-color: rgba(255, 0, 0, 0.15);
+  color: red;
+  padding: 10px 15px;
+  margin-bottom: 15px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+}
+
+.success-message {
+  background-color: rgba(0, 255, 0, 0.15);
+  color: #00cc00;
+  padding: 10px 15px;
+  margin-bottom: 15px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+}
+
+/* Password field and icon placement */
+.password-field {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.password-field input {
+  width: 100%;
+  padding-right: 2.2em;
+}
+.password-toggle {
+  position: absolute;
+  right: 0.7em;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  font-size: 1.1rem;
+  color: inherit;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  line-height: 1;
+  margin: 0;
+}
+
+/* Animations */
+@keyframes fadeInUp {
+  0% {
+    transform: translateY(40px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Responsive */
+@media screen and (max-width: 500px) {
+  .auth-form {
+    padding: 25px 20px;
+  }
+}

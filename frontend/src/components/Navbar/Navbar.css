@@ -1,0 +1,245 @@
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  background: var(--card-bg);
+  color: var(--text-color);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  border-bottom: 1px solid var(--border-color);
+  box-shadow: 0 2px 10px var(--shadow-color);
+}
+
+.navbar-logo {
+  cursor: pointer;
+  transition: opacity 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.navbar-logo:hover {
+  opacity: 0.8;
+}
+
+.navbar-logo-img {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+}
+
+.navbar-logo-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.navbar-logo .logo-text {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-right: 1rem;
+  color: var(--text-color);
+}
+
+.navbar-logo .tagline {
+  font-size: 1rem;
+  opacity: 0.7;
+  color: var(--text-color);
+}
+
+.navbar-links {
+  list-style: none;
+  display: flex;
+  gap: 2rem;
+  align-items: center;
+}
+
+.navbar-links a {
+  color: var(--text-color);
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+}
+
+.navbar-links a:hover {
+  color: var(--text-color);
+  background: var(--accent-color);
+  color: white;
+}
+
+.wallet-balance {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-color);
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.wallet-balance:hover {
+  background: var(--accent-color);
+  color: white;
+}
+
+.wallet-icon {
+  width: 24px;
+  height: 24px;
+  filter: none;
+}
+
+[data-theme='dark'] .wallet-icon {
+  filter: brightness(0) invert(1);
+}
+
+.pro-label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: linear-gradient(45deg, #FFD700, #FFA500);
+  color: black;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  margin-left: 8px;
+}
+
+.pro-label .infinity {
+  font-size: 1rem;
+}
+
+/* User Greeting Styles */
+.user-greeting {
+  font-weight: 500;
+  color: var(--text-color);
+  padding: 0.5rem 1rem;
+  background: var(--bg-color);
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
+}
+
+.user-greeting span {
+  font-size: 0.95rem;
+}
+
+/* Logout Button Styles */
+.logout-btn {
+  background: var(--accent-color);
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.95rem;
+  box-shadow: 0 2px 8px rgba(255, 107, 107, 0.3);
+}
+
+.logout-btn:hover {
+  background: #ee5a24;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(255, 107, 107, 0.4);
+}
+
+/* Login Modal Overlay Styles */
+.login-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.35);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.login-modal-content {
+  background: var(--bg-color);
+  color: var(--text-color);
+  border-radius: 18px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+  padding: 0;
+  position: relative;
+  max-width: 440px;
+  width: 95vw;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  animation: fadeInUp 0.4s cubic-bezier(0.4,0,0.2,1);
+}
+
+.login-modal-close {
+  position: absolute;
+  top: 16px;
+  right: 22px;
+  background: none;
+  border: none;
+  font-size: 2rem;
+  color: var(--text-color);
+  cursor: pointer;
+  z-index: 10;
+  transition: color 0.2s;
+}
+.login-modal-close:hover {
+  color: var(--accent-color);
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(40px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .navbar-logo {
+    gap: 8px;
+  }
+  
+  .navbar-logo-img {
+    width: 32px;
+    height: 32px;
+  }
+  
+  .navbar-logo .logo-text {
+    font-size: 1.2rem;
+  }
+  
+  .navbar-logo .tagline {
+    font-size: 0.8rem;
+  }
+} 
+
+/* Login button in navbar (modal trigger) */
+.login-modal-btn {
+  background: var(--accent-color);
+  color: #fff;
+  border: none;
+  padding: 0.5rem 1.2rem;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+  font-size: 1rem;
+  box-shadow: 0 2px 8px var(--shadow-color);
+}
+.login-modal-btn:hover,
+.login-modal-btn:focus {
+  background: var(--button-hover);
+  color: #fff;
+}
+[data-theme='dark'] .login-modal-btn {
+  background: var(--accent-color);
+  color: #222;
+} 

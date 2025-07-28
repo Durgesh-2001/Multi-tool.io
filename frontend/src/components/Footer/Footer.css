@@ -1,0 +1,397 @@
+.footer {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  padding: 60px 40px 30px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  border-top: 1px solid var(--border-color);
+  transition: all 0.3s ease-in-out;
+}
+
+.footer-content {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 60px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.footer-content-left,
+.footer-content-center,
+.footer-content-right {
+  flex: 1;
+  min-width: 280px;
+}
+
+.footer-logo {
+  margin-bottom: 15px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: opacity 0.3s ease;
+}
+
+.footer-logo:hover {
+  opacity: 0.8;
+}
+
+.footer-logo-img {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+}
+
+.footer-logo-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.footer-logo .logo-text {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-right: 1rem;
+  color: var(--text-color);
+  display: block;
+}
+
+.footer-logo .tagline {
+  font-size: 1rem;
+  opacity: 0.7;
+  color: var(--text-color);
+  display: block;
+  margin-top: 5px;
+}
+
+.footer-content-left p {
+  margin: 12px 0;
+  font-size: 16px;
+  font-weight: 200;
+  color: var(--text-color);
+  opacity: 0.8;
+}
+
+.footer-trendy-lines {
+  margin-top: 15px;
+}
+
+.footer-trendy-lines p {
+  margin: 8px 0;
+  font-size: 18px;
+  font-weight: 300;
+  color: var(--text-color);
+  opacity: 0.7;
+  font-style: italic;
+}
+
+.footer-content-center {
+  flex: 1;
+  min-width: 280px;
+  display: flex;
+  justify-content: center;
+}
+
+.connect-section {
+  text-align: center;
+}
+
+.connect-section h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-color);
+  margin-bottom: 15px;
+  margin-top: 0;
+}
+
+.footer-social-icons {
+  display: flex;
+  gap: 25px;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.footer-social-icons img {
+  width: 30px;
+  height: 30px;
+  transition: transform 0.3s ease, filter 0.3s ease;
+  cursor: pointer;
+}
+
+.footer-social-icons img:hover {
+  transform: scale(1.15);
+  filter: brightness(0.7);
+}
+
+.footer-content-right ul {
+  list-style: none;
+  padding: 0;
+}
+
+.footer-content-right h2 {
+  list-style: none;
+  padding: 0;
+  margin: 10px 0;
+  font-size: 17px;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.footer-content-right ul li {
+  margin: 10px 0;
+  font-size: 17px;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.footer-content-right ul li:hover,
+.footer-content-right h2:hover {
+  color: tomato;
+  font-weight: 600;
+}
+
+.footer-subscribe {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.footer-subscribe form {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.footer-subscribe input {
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  flex: 1;
+  min-width: 180px;
+  font-size: 14px;
+}
+
+.footer-subscribe button {
+  padding: 8px 16px;
+  background-color: #000;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.footer-subscribe button:hover {
+  background-color: #333;
+}
+
+.subscribe-message {
+  color: #28a745;
+  font-size: 14px;
+  font-weight: 500;
+  margin: 0;
+  text-align: center;
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.footer hr {
+  border: 0;
+  height: 1px;
+  background: #e0e0e0;
+  margin: 40px 0 20px;
+}
+
+.footer-text {
+  text-align: center;
+  font-size: 16px;
+  color: var(--text-color);
+  opacity: 0.7;
+}
+
+.footer-name {
+  cursor: pointer;
+  transition: color 0.3s ease;
+  font-weight: 600;
+}
+
+.footer-name:hover {
+  color: gold;
+}
+
+.made-in-india {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  margin-top: -2px;
+  font-size: 1.08rem;
+  font-weight: 600;
+  color: var(--text-color);
+  letter-spacing: 0.5px;
+  background: none;
+  border-radius: 16px;
+  padding: 4px 0 4px 0;
+  box-shadow: none;
+  width: fit-content;
+  animation: fadeInUp 0.8s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.made-in-india-text {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-weight: 600;
+  color: var(--text-color);
+  text-shadow: none;
+}
+
+.india-flag {
+  font-size: 1.5em;
+  display: inline-block;
+  animation: flagWave 1.6s infinite linear alternate;
+  transform-origin: 70% 60%;
+}
+
+@keyframes flagWave {
+  0% { transform: rotate(-8deg) scale(1.08); }
+  50% { transform: rotate(8deg) scale(1.13); }
+  100% { transform: rotate(-8deg) scale(1.08); }
+}
+
+.india-flag-svg-container {
+  display: flex;
+  align-items: center;
+  height: 24px;
+  margin-left: 6px;
+}
+
+.india-flag-svg {
+  width: 36px;
+  height: 22px;
+  border-radius: 3px;
+  box-shadow: 0 2px 8px rgba(255, 103, 31, 0.10);
+  overflow: visible;
+  /* Windflow animation */
+  animation: flagWaveWind 2.2s infinite cubic-bezier(0.4, 0.2, 0.2, 1) alternate;
+  transform-origin: left center;
+}
+
+@keyframes flagWaveWind {
+  0% {
+    transform: perspective(60px) rotateY(0deg) skewY(0deg) scaleY(1);
+    filter: brightness(1);
+  }
+  20% {
+    transform: perspective(60px) rotateY(-7deg) skewY(-2deg) scaleY(1.04);
+    filter: brightness(1.05);
+  }
+  40% {
+    transform: perspective(60px) rotateY(7deg) skewY(2deg) scaleY(0.98);
+    filter: brightness(0.98);
+  }
+  60% {
+    transform: perspective(60px) rotateY(-5deg) skewY(-1deg) scaleY(1.03);
+    filter: brightness(1.03);
+  }
+  80% {
+    transform: perspective(60px) rotateY(5deg) skewY(1deg) scaleY(0.97);
+    filter: brightness(0.97);
+  }
+  100% {
+    transform: perspective(60px) rotateY(0deg) skewY(0deg) scaleY(1);
+    filter: brightness(1);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive Design */
+
+@media (max-width: 768px) {
+  .footer-content {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 40px;
+  }
+
+  .footer-logo {
+    gap: 8px;
+  }
+
+  .footer-logo-img {
+    width: 32px;
+    height: 32px;
+  }
+
+  .footer-logo .logo-text {
+    font-size: 1.3rem;
+  }
+
+  .footer-logo .tagline {
+    font-size: 0.9rem;
+  }
+
+  .footer-trendy-lines p {
+    font-size: 13px;
+  }
+
+  .connect-section h3 {
+    font-size: 16px;
+  }
+
+  .footer-social-icons {
+    gap: 20px;
+  }
+
+  .footer-social-icons img {
+    width: 28px;
+    height: 28px;
+  }
+
+  .footer-content-right ul li {
+    font-size: 16px;
+  }
+
+  .footer-content-right h2 {
+    font-size: 18px;
+  }
+
+  .footer-subscribe form {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .footer-subscribe input,
+  .footer-subscribe button {
+    width: 100%;
+  }
+
+  .footer-subscribe input {
+    font-size: 16px;
+  }
+
+  .footer-subscribe button {
+    font-size: 16px;
+  }
+}
