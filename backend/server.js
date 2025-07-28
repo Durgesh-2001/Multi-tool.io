@@ -28,7 +28,7 @@ const PORT = process.env.PORT || 5000;
 
 // ✨ Production-Ready CORS Configuration
 const allowedOrigins = [
-  'https://testing.vercel.app',
+  'https://testing-alpha-bice.vercel.app',
   'http://localhost:5173',
   'http://localhost:74'
 ];
