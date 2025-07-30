@@ -31,8 +31,9 @@
 .landing-title {
   font-size: 4rem;
   font-weight: 800;
-  margin-bottom: 1rem;
+  margin-bottom: 12px;
   color: var(--text-color);
+  padding: 40px 0 0 0;
 }
 
 .landing-tagline {

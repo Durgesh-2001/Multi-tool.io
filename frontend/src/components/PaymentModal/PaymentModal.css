@@ -1,283 +1,202 @@
-/* Overlay */
+/* --- Root Variables for Consistent Theming --- */
+:root {
+  --modal-bg-light: #ffffff;
+  --modal-bg-dark: #2d3748; /* A deep, cool gray */
+  --text-light-primary: #1a202c;
+  --text-light-secondary: #4a5568;
+  --text-dark-primary: #edf2f7;
+  --text-dark-secondary: #a0aec0;
+  --primary-color: #16a34a; /* Your green accent */
+  --primary-color-hover: #15803d;
+  --secondary-btn-bg-light: #f0fdf4;
+  --secondary-btn-text-light: #166534;
+  --secondary-btn-bg-dark: #3f4a5b;
+  --secondary-btn-text-dark: #e2e8f0;
+  --border-light: #e2e8f0;
+  --border-dark: #4a5568;
+  --shadow-color: rgba(22, 163, 74, 0.1);
+  --shadow-color-dark: rgba(0, 0, 0, 0.4);
+}
+
+/* --- Modal Overlay & Animation --- */
 .modal-overlay-new {
   position: fixed;
-  top: 0; left: 0;
-  width: 100vw; height: 100vh;
-  background: rgba(0, 0, 0, 0.6);
-  display: flex; align-items: center; justify-content: center;
-  z-index: 1000;
-}
-
-/* Modal Content */
-.modal-content-new {
-  background: white;
-  max-width: 900px;
-  width: 95%;
-  padding: 2rem;
-  border-radius: 1rem;
-  position: relative;
-  overflow-y: auto;
-  max-height: 90vh;
-  box-shadow: 0 0 15px rgba(0,0,0,0.2);
-  transition: all 0.3s ease-in-out;
-}
-
-.modal-content-new.dark {
-  background: #1f2937;
-  color: #fff;
-}
-
-/* Header */
-.modal-header {
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-bottom: 1rem;
+  z-index: 1000;
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+  backdrop-filter: blur(8px);
+}
+
+.modal-overlay-new.open {
+  opacity: 1;
+}
+
+/* --- Modal Content & Animation --- */
+.modal-content-new {
   position: relative;
+  width: 90%;
+  max-width: 450px;
+  padding: 2.5rem;
+  border-radius: 24px; /* Softer corners */
+  transform: scale(0.95);
+  transition: transform 0.3s ease-in-out;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+.modal-overlay-new.open .modal-content-new {
+  transform: scale(1);
+}
+
+/* Light & Dark Mode Theming */
+.modal-content-new.light {
+  background-color: var(--modal-bg-light);
+  color: var(--text-light-primary);
+  box-shadow: 0 10px 25px -5px var(--shadow-color), 0 8px 10px -6px var(--shadow-color);
+  border: 1px solid var(--border-light);
+}
+
+.modal-content-new.dark {
+  background-color: var(--modal-bg-dark);
+  color: var(--text-dark-primary);
+  box-shadow: 0 10px 25px -5px var(--shadow-color-dark), 0 8px 10px -6px var(--shadow-color-dark);
+  border: 1px solid var(--border-dark);
+}
+
+/* --- Modal Header --- */
+.modal-header {
+  text-align: center;
+  margin-bottom: 0.75rem;
 }
 
 .modal-header h2 {
-  font-size: 1.6rem;
-  font-weight: 600;
-}
-
-/* Close button (top right) */
-.close-button-new {
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
-  background: none;
-  border: none;
-  font-size: 1.5rem;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-/* Back button (also top right, but left of close) */
-.back-button {
-  position: absolute;
-  top: 1rem;
-  right: 3.5rem;
-  padding: 6px 12px;
-  background: #e5e7eb;
-  border: none;
-  border-radius: 6px;
-  font-weight: 500;
-  cursor: pointer;
-}
-
-/* Plan Grid */
-.plans-view {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: stretch;
-  gap: 2rem;
-  margin-top: 2.5rem;
-  flex-wrap: wrap;
-}
-
-/* Plan Card */
-.plan-card-new {
-  background: #fff;
-  border-radius: 18px;
-  box-shadow: 0 4px 32px 0 rgba(0,0,0,0.10), 0 1.5px 6px 0 rgba(0,0,0,0.04);
-  border: 2px solid #e5e7eb;
-  min-width: 260px;
-  max-width: 320px;
-  min-height: 420px;
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  padding: 2.2rem 2rem 2rem 2rem;
-  position: relative;
-  transition: box-shadow 0.2s, border 0.2s, transform 0.2s;
-}
-
-.plan-card-new:hover {
-  box-shadow: 0 0 10px rgba(0,0,0,0.1);
-  transform: translateY(-3px);
-}
-
-.plan-card-new.highlight {
-  border: 2.5px solid #16a34a;
-  box-shadow: 0 8px 32px 0 rgba(22,163,74,0.18), 0 4px 16px 0 rgba(0,0,0,0.10);
-  z-index: 2;
-}
-
-.plan-card-new .tag {
-  position: absolute;
-  top: 1.2rem;
-  left: 1.2rem;
-  background: #16a34a;
-  color: #fff;
-  padding: 5px 14px;
-  border-radius: 8px;
-  font-size: 0.9rem;
+  font-size: 1.75rem;
   font-weight: 700;
-  letter-spacing: 0.5px;
-  box-shadow: 0 2px 8px rgba(22,163,74,0.12);
+  line-height: 1.3;
 }
 
-.plan-card-new h3 {
-  font-size: 1.35rem;
-  font-weight: 700;
-  margin-bottom: 0.5rem;
-  color: #111827;
-  text-align: left;
-}
-
-.price-new {
-  font-size: 2.1rem;
-  font-weight: 800;
-  margin-bottom: 0.2rem;
-  color: #16a34a;
-  text-align: left;
-}
-
-.slashed-price-animated {
-  text-decoration: line-through;
-  margin-left: 0.7rem;
-  font-size: 1.1rem;
-  color: #bdbdbd;
-  font-weight: 500;
-}
-
-/* Button */
-.plan-btn-new {
-  background: #16a34a;
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  padding: 0.7rem 0;
-  font-weight: 700;
-  cursor: pointer;
-  margin: 1.5rem 0 0.5rem 0;
-  font-size: 1.1rem;
-  width: 100%;
-  box-shadow: 0 1px 4px rgba(22,163,74,0.08);
-  transition: background 0.2s, box-shadow 0.2s;
-}
-
-.plan-btn-new:hover {
-  background: #15803d;
-  box-shadow: 0 2px 8px rgba(22,163,74,0.16);
-}
-
-/* Features */
-.features-new {
-  list-style: none;
-  padding: 0;
-  margin: 1.5rem 0 0 0;
-  width: 100%;
-  text-align: left;
-}
-
-.features-new li {
-  font-size: 1.08rem;
-  line-height: 2.1rem;
-  padding-left: 0;
-  margin-bottom: 0.1rem;
-  border-left: none;
-  background: transparent;
-  min-height: 2.1rem;
-  position: relative;
-  color: #222;
-}
-
-.features-new li:last-child {
-  margin-bottom: 0;
-}
-
-/* Subscription Management Box */
-.subscription-management {
-  grid-column: span 2;
-  padding: 1rem;
-  background: #fff0f0;
-  border: 1px solid #f87171;
-  border-radius: 0.8rem;
-  margin-bottom: 1rem;
-}
-
-/* Cancel Button */
-.cancel-btn {
-  background: #ef4444;
-  color: white;
-  border: none;
-  padding: 0.4rem 0.8rem;
-  border-radius: 6px;
-  cursor: pointer;
-  margin-top: 0.5rem;
-}
-
-/* Payment View */
-.payment-view {
-  text-align: center;
-  padding: 1rem 0;
-}
-
+/* --- Total Amount --- */
 .payment-amount {
-  font-size: 1.2rem;
-  font-weight: bold;
-  margin: 1rem 0;
+  text-align: center;
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: var(--primary-color);
+  margin-bottom: 1.5rem;
 }
 
+/* --- Payment Method Selector --- */
 .payment-method-selector {
   display: flex;
   justify-content: center;
   gap: 1rem;
-  margin: 1rem 0;
+  margin-bottom: 2rem;
 }
 
+/* --- General Button Styles --- */
 .payment-btn-new {
-  padding: 0.6rem 1.2rem;
-  border-radius: 8px;
-  border: none;
-  background: #16a34a;
-  color: white;
-  cursor: pointer;
+  flex-grow: 1;
+  padding: 0.8rem 1rem;
+  font-size: 1rem;
   font-weight: 600;
-  transition: background 0.2s ease;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  background-color: var(--primary-color);
+  color: white;
+  border: 2px solid transparent;
 }
 
+.payment-btn-new:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  background-color: var(--primary-color-hover);
+}
+
+.payment-btn-new:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: none;
+}
+
+.payment-btn-new:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Secondary Button Style (for inactive tab) */
 .payment-btn-new.secondary {
-  background: #2563eb;
+  background-color: transparent;
+}
+.modal-content-new.light .payment-btn-new.secondary {
+  color: var(--text-light-secondary);
+  border: 2px solid var(--border-light);
+}
+.modal-content-new.dark .payment-btn-new.secondary {
+  color: var(--text-dark-secondary);
+  border: 2px solid var(--border-dark);
 }
 
-.payment-btn-new:hover {
-  filter: brightness(1.05);
-}
-
-/* QR Code View */
+/* --- UPI QR Code Section --- */
 .qr-payment-new {
-  margin-top: 1.2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* This is the key to centering */
+  justify-content: center;
+  gap: 1.5rem; /* Space between QR, text, and button */
+  padding: 2rem;
+  border-radius: 16px;
+  animation: fadeIn 0.5s ease-in-out;
 }
 
-.qr-payment-new p {
-  margin-top: 1rem;
-  font-size: 0.95rem;
+.modal-content-new.light .qr-payment-new {
+  background-color: #f7fafc;
+  border: 1px solid var(--border-light);
 }
 
-/* Test Card */
-.test-card-info-new {
-  margin-top: 1rem;
-  font-size: 0.85rem;
-  color: #555;
-  font-style: italic;
+.modal-content-new.dark .qr-payment-new {
+  background-color: #1a202c;
+  border: 1px solid var(--border-dark);
 }
 
-/* Flip Card Animation */
+/* QR Code Styling */
+.qr-payment-new > div { /* Target the div wrapping the QRCode component */
+  background-color: white;
+  padding: 1rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+/* UPI Instructions Text */
+.upi-instructions {
+  text-align: center;
+  font-size: 1rem;
+  line-height: 1.6;
+  max-width: 300px;
+}
+.modal-content-new.light .upi-instructions {
+  color: var(--text-light-secondary);
+}
+.modal-content-new.dark .upi-instructions {
+  color: var(--text-dark-secondary);
+}
+
+/* --- Card Payment Section --- */
 .flip-card-container {
   perspective: 1000px;
-  width: 320px;
-  height: 200px;
+  margin-bottom: 2rem;
 }
 
 .flip-card {
+  position: relative;
   width: 100%;
   height: 100%;
-  position: relative;
-  transition: transform 0.6s cubic-bezier(0.4,0.2,0.2,1);
+  transition: transform 0.8s;
   transform-style: preserve-3d;
 }
 
@@ -285,53 +204,59 @@
   transform: rotateY(180deg);
 }
 
-.flip-card-front, .flip-card-back {
+.flip-card-front,
+.flip-card-back {
   position: absolute;
   width: 100%;
   height: 100%;
+  -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
   border-radius: 18px;
-  overflow: hidden;
 }
 
 .flip-card-back {
   transform: rotateY(180deg);
 }
 
-/* Responsive */
-@media (max-width: 1200px) {
-  .plans-view {
-    flex-direction: column;
-    align-items: center;
-    gap: 1.5rem;
-  }
-  .plan-card-new {
-    min-width: 220px;
-    max-width: 100%;
-    min-height: 340px;
-    padding: 2rem 1.2rem 1.2rem 1.2rem;
-  }
+/* --- Close Button --- */
+.close-button-new {
+  position: absolute;
+  top: 0.75rem; /* Closer to the top edge */
+  right: 0.75rem; /* Closer to the right edge */
+  width: 2.5rem;
+  height: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  border-radius: 50%; /* Circular shape */
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
 }
-@media (max-width: 768px) {
-  .plans-view {
-    flex-direction: column;
-    align-items: center;
-    gap: 1.2rem;
-  }
-  .plan-card-new {
-    min-width: 100%;
-    max-width: 100%;
-    min-height: 320px;
-    padding: 1.2rem 0.7rem 1rem 0.7rem;
-  }
 
-  .back-button {
-    right: 3rem;
-    top: 0.8rem;
-  }
+.modal-content-new.light .close-button-new {
+  color: #a0aec0;
+}
 
-  .close-button-new {
-    right: 1rem;
-    top: 0.8rem;
-  }
+.modal-content-new.dark .close-button-new {
+  color: var(--text-dark-secondary);
+}
+
+.close-button-new:hover {
+  transform: rotate(90deg);
+  color: var(--primary-color);
+  background-color: rgba(0, 0, 0, 0.05); /* Subtle background on hover */
+}
+
+.modal-content-new.dark .close-button-new:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+
+/* --- Animations --- */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }

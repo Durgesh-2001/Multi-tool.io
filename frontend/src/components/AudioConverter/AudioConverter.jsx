@@ -301,7 +301,6 @@ const AudioConverter = () => {
           {error}
         </div>
       )}
-      {/* Removed LoginModal usage */}
       <div className="converter-container">
         <div className="conversion-type-selector">
           <button

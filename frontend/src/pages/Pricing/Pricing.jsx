@@ -25,16 +25,13 @@ const Pricing = () => {
   const [cancelMsg, setCancelMsg] = useState('');
 
   useEffect(() => {
-    // Fetch user subscription status on mount
     const token = localStorage.getItem('token');
     if (token) {
-      // CORRECTED: Use the API_BASE_URL constant
       fetch(`${API_BASE_URL}/payment/status`, {
         headers: { 'Authorization': `Bearer ${token}` }
       })
         .then(res => {
             if (!res.ok) {
-                // If response is not ok, log the error and return null
                 console.error('Failed to fetch user status:', res.status, res.statusText);
                 return null;
             }
@@ -47,13 +44,19 @@ const Pricing = () => {
           }
         })
         .catch(err => {
-            // Catch network errors or JSON parsing errors
             console.error('Error fetching user status:', err);
         });
     }
   }, [modalOpen]);
 
+  // UPDATED: This function now handles the "Free" plan separately.
   const handlePlanSelect = (plan) => {
+    // If the user clicks on the "Free" plan, navigate them to the homepage.
+    if (plan.name === 'Free') {
+      navigate('/');
+      return; // Stop further execution
+    }
+    // For any other plan, open the payment modal.
     setSelectedPlan(plan);
     setModalOpen(true);
   };
@@ -71,7 +74,6 @@ const Pricing = () => {
     setCancelMsg('');
     const token = localStorage.getItem('token');
     try {
-      // CORRECTED: Use the API_BASE_URL constant
       const res = await fetch(`${API_BASE_URL}/payment/cancel`, {
         method: 'POST',
         headers: {
@@ -95,7 +97,6 @@ const Pricing = () => {
       <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 1rem' }}>
         <button onClick={() => navigate(-1)} style={{ marginBottom: 32, background: 'none', border: 'none', color: '#2563eb', fontWeight: 600, fontSize: '1rem', cursor: 'pointer' }}>{'< Back'}</button>
         <h1 style={{ fontSize: '2.5rem', fontWeight: 800, marginBottom: '2.5rem', textAlign: 'center', color: isDarkMode ? '#fff' : '#111827' }}>Choose Your Plan</h1>
-        {/* You may want to add back the UI for subscription status and cancellation here */}
         {cancelMsg && <p style={{ textAlign: 'center', color: 'green', marginBottom: '1rem' }}>{cancelMsg}</p>}
         {isProUser && subscriptionEnd && (
             <div style={{ textAlign: 'center', marginBottom: '2rem', color: isDarkMode ? '#ccc' : '#555' }}>
