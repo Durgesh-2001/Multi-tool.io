@@ -1,7 +1,7 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import './AINumberPredictor.css';
 
-const API_URL = '/api/tools/ai-number-predictor';
+const API_BASE_URL = `${import.meta.env.VITE_BACKEND_URL}/api`;
 
 const AI_STEPS = [
   'Initializing neural network... 🤖',
@@ -24,59 +24,77 @@ const AINumberPredictor = () => {
   const [showChart, setShowChart] = useState(false);
   const [chartValue, setChartValue] = useState(0);
   const [showMatrix, setShowMatrix] = useState(false);
+  const [inputLocked, setInputLocked] = useState(false);
   const chartInterval = useRef(null);
+  const stepTimeout = useRef(null);
 
+  // Allow any integer input (positive or negative)
   const handleInputChange = (e) => {
-    setGuess(e.target.value.replace(/[^0-9]/g, ''));
-    setError('');
+    const val = e.target.value;
+    // Allow negative sign only at start, only digits after
+    if (/^[-]?\d*$/.test(val)) {
+      setGuess(val);
+      setError('');
+    }
   };
 
   const handleGuess = async (e) => {
     e.preventDefault();
-    setResult('');
-    setSteps([]);
-    setCurrentStep(0);
-    setError('');
-    setShowChart(false);
-    setShowMatrix(true);
-    setChartValue(0);
-    const num = Number(guess);
-    if (isNaN(num) || num < 0 || num > 99) {
-      setError('Please enter a number between 0 and 99!');
+    // Accept any integer (positive or negative)
+    if (!guess || isNaN(Number(guess)) || !/^[-]?\d+$/.test(guess)) {
+      setError('Please enter a valid integer number!');
       return;
     }
     setLoading(true);
+    setShowMatrix(true);
+    setInputLocked(true);
+
     try {
-      const res = await fetch(API_URL, {
+      const res = await fetch(`${API_BASE_URL}/tools/ai-number-predictor`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ guess: num })
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({ guess: Number(guess) })
       });
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.message || `An error occurred: ${res.statusText}`);
+      }
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Something went wrong!');
       setSteps(AI_STEPS);
-      // Animate steps
       let i = 0;
       const showStep = () => {
         setCurrentStep(i + 1);
-        if (i === 2) setShowChart(true); // Show chart after 3rd step
+        if (i === 2) setShowChart(true);
         if (i < AI_STEPS.length - 1) {
           i++;
-          setTimeout(showStep, 1200);
+          stepTimeout.current = setTimeout(showStep, 1200);
         } else {
-          setTimeout(() => {
+          stepTimeout.current = setTimeout(() => {
             setShowMatrix(false);
-            setResult(data.result);
+            let finalResult = typeof data.result === 'string' ? data.result.replace(/\.$/, '') : data.result;
+            setResult(finalResult);
             setLoading(false);
           }, 1800);
         }
       };
-      // Animate chart
       chartInterval.current = setInterval(() => {
-        setChartValue((v) => (v < 100 ? v + Math.floor(Math.random() * 7) : 100));
+        setChartValue((v) => {
+          if (v >= 100) return 100;
+          const remaining = 100 - v;
+          const increment = Math.max(1, Math.min(Math.floor(Math.random() * 7), remaining));
+          return v + increment;
+        });
       }, 180);
       showStep();
-      setTimeout(() => clearInterval(chartInterval.current), 6000);
+      
+      // Ensure we reach 100% by forcing it after 5.5 seconds
+      setTimeout(() => {
+        setChartValue(100);
+        clearInterval(chartInterval.current);
+      }, 5500);
     } catch (err) {
       setError(err.message);
       setLoading(false);
@@ -95,10 +113,18 @@ const AINumberPredictor = () => {
     setShowChart(false);
     setShowMatrix(false);
     setChartValue(0);
+    setInputLocked(false);
     clearInterval(chartInterval.current);
+    clearTimeout(stepTimeout.current);
   };
+  
+  useEffect(() => {
+    return () => {
+      clearInterval(chartInterval.current);
+      clearTimeout(stepTimeout.current);
+    };
+  }, []);
 
-  // Matrix effect (simple animated code rain)
   const renderMatrix = () => (
     <div className="ai-matrix-effect">
       {[...Array(16)].map((_, i) => (
@@ -109,63 +135,82 @@ const AINumberPredictor = () => {
     </div>
   );
 
-  // Animated confidence chart (SVG bar)
   const renderChart = () => (
     <div className="ai-confidence-chart">
-      <div className="ai-confidence-label">AI Confidence</div>
+      <div className="ai-confidence-label theme-text">AI Confidence</div>
       <svg width="220" height="32">
         <rect x="10" y="10" width="200" height="12" rx="6" fill="#eee" />
         <rect x="10" y="10" width={2 * chartValue} height="12" rx="6" fill="#43a047" style={{ transition: 'width 0.3s' }} />
-        <text x="110" y="22" textAnchor="middle" fontSize="13" fill="#333" fontWeight="bold">{chartValue}%</text>
+        <text x="110" y="22" textAnchor="middle" fontSize="13" className="chart-text" style={{ fill: 'currentColor' }} fontWeight="bold">{chartValue}%</text>
       </svg>
     </div>
   );
 
-  // Animated result reveal
   const renderResult = () => (
-    <div className="ai-number-predictor-result animate-result">
-      <span className="ai-result-label">Final AI Prediction:</span>
-      <span className="ai-result-number">{guess}</span>
+    <div className="ai-number-predictor-result">
+      <span className="ai-result-number">{result}</span>
+      <button type="button" className="ai-number-predictor-btn try-again" onClick={handleReset}>Try Again</button>
     </div>
   );
 
   return (
-    <div className="ai-number-predictor-card">
+    <div className="ai-number-predictor-card enhanced">
       <div className="ai-number-predictor-header">
         <span className="ai-number-predictor-icon">🔮</span>
         <h2 className="ai-number-predictor-title">AI Number Predictor</h2>
       </div>
-      <div className="ai-number-predictor-desc">
-        Think of a number between <b>0</b> and <b>99</b>. Our advanced AI will attempt to predict your secret number using neural networks, quantum algorithms, and global data analysis!
+      <div className="ai-number-predictor-desc theme-text">
+        Think of <b>any integer number</b>. Our advanced AI will attempt to predict your secret number using neural networks, quantum algorithms, and global data analysis!
       </div>
-      {/* Only show the form if not loading and no result is present */}
+
+      {/* Input area only visible before prediction */}
       {(!loading && !result) && (
         <form className="ai-number-predictor-form" onSubmit={handleGuess}>
           <input
             type="text"
-            maxLength={2}
             value={guess}
             onChange={handleInputChange}
             placeholder="Enter your number..."
-            disabled={loading}
+            disabled={loading || inputLocked}
             className="ai-number-predictor-input"
           />
-          <button type="submit" className="ai-number-predictor-btn" disabled={loading || !guess}>Predict</button>
-          <button type="button" className="ai-number-predictor-btn reset" onClick={handleReset} disabled={loading && !result}>Reset</button>
+          <button type="submit" className="ai-number-predictor-btn" disabled={loading || !guess || inputLocked}>Predict</button>
         </form>
       )}
+
+      {/* Hide input during prediction */}
+      {loading && !result && (
+        <>
+          <div className="ai-number-predictor-steps">
+            {steps.slice(0, currentStep).map((step, idx) => (
+              <div key={idx} className="ai-number-predictor-step animate-step">{step}</div>
+            ))}
+          </div>
+          {showMatrix && <div className="ai-matrix-container">{renderMatrix()}</div>}
+          {showChart && <div className="ai-chart-container">{renderChart()}</div>}
+          <div className="ai-number-predictor-wait">🔍 Processing...</div>
+        </>
+      )}
+
+      {/* After prediction, show locked input above result for validation */}
+      {result && (
+        <>
+          <div className="ai-number-predictor-form" style={{ marginBottom: '10px' }}>
+            <input
+              type="text"
+              value={guess}
+              disabled={true}
+              className="ai-number-predictor-input locked"
+              style={{ background: '#e8f0fe', color: '#222', fontWeight: 'bold', textAlign: 'center', fontSize: '1.2em', border: '2px solid #43a047', borderRadius: '8px' }}
+            />
+          </div>
+          {renderResult()}
+        </>
+      )}
+
       {error && <div className="ai-number-predictor-error">{error}</div>}
-      <div className="ai-number-predictor-steps">
-        {steps.slice(0, currentStep).map((step, idx) => (
-          <div key={idx} className="ai-number-predictor-step animate-step">{step}</div>
-        ))}
-      </div>
-      {showMatrix && loading && <div className="ai-matrix-container">{renderMatrix()}</div>}
-      {showChart && loading && <div className="ai-chart-container">{renderChart()}</div>}
-      {loading && !result && <div className="ai-number-predictor-wait">🔍 Processing...</div>}
-      {result && renderResult()}
     </div>
   );
 };
 
-export default AINumberPredictor; 
+export default AINumberPredictor;

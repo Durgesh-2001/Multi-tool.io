@@ -1,43 +1,71 @@
-/* Reset and base */
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: #f3f4f6;
-  color: #1f2937;
-}
-
-/* Container card */
+/* AI Number Predictor Component */
 .ai-number-predictor-card {
-  max-width: 500px;
-  margin: 50px auto;
+  max-width: 550px;
+  margin: 2rem auto;
   padding: 2rem;
-  background: white;
-  border-radius: 1rem;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+  border-radius: 16px;
   transition: all 0.3s ease;
+  /* Light theme */
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+  color: #333333;
+}
+
+/* Theme-specific text styling */
+.theme-text {
+  color: #333333;
+  transition: color 0.3s ease;
+}
+
+/* Dark theme */
+[data-theme='dark'] .ai-number-predictor-card {
+  background: #1e1e1e;
+  border-color: #333333;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+  color: #ffffff;
+}
+
+[data-theme='dark'] .theme-text {
+  color: #ffffff;
+}
+
+.ai-confidence-chart .chart-text {
+  fill: #333333;
+  transition: fill 0.3s ease;
+}
+
+[data-theme='dark'] .ai-confidence-chart .chart-text {
+  fill: #ffffff;
 }
 
 /* Header */
 .ai-number-predictor-header {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 1rem;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
 }
 
 .ai-number-predictor-icon {
-  font-size: 1.8rem;
+  font-size: 2rem;
 }
 
 .ai-number-predictor-title {
-  font-size: 1.5rem;
+  font-size: 1.8rem;
   font-weight: 600;
-  color: #4a148c;
+  margin: 0;
+  background: linear-gradient(45deg, #43a047, #66bb6a);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+[data-theme='dark'] .ai-number-predictor-title {
+  background: linear-gradient(45deg, #66bb6a, #98ee99);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 /* Description */
@@ -51,62 +79,108 @@ body {
 /* Form */
 .ai-number-predictor-form {
   display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-  margin-bottom: 1rem;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
 }
 
 .ai-number-predictor-input {
-  padding: 0.75rem 1rem;
+  flex: 1;
+  padding: 0.8rem 1rem;
   font-size: 1rem;
-  border: 2px solid #d1d5db;
   border-radius: 8px;
-  transition: border-color 0.3s;
+  border: 2px solid #e0e0e0;
+  background: #ffffff;
+  color: #333333;
+  transition: all 0.3s ease;
+}
+
+[data-theme='dark'] .ai-number-predictor-input {
+  background: #2d2d2d;
+  border-color: #404040;
+  color: #ffffff;
 }
 
 .ai-number-predictor-input:focus {
-  border-color: #7c3aed;
+  border-color: #43a047;
   outline: none;
+}
+
+[data-theme='dark'] .ai-number-predictor-input:focus {
+  border-color: #66bb6a;
+}
+
+.ai-number-predictor-input.locked {
+  background: #f8f9fa !important;
+  border-color: #43a047 !important;
+  color: #1a1a1a !important;
+  font-weight: bold;
+  text-align: center;
+  font-size: 1.2em;
+}
+
+[data-theme='dark'] .ai-number-predictor-input.locked {
+  background: #2d2d2d !important;
+  border-color: #66bb6a !important;
+  color: #ffffff !important;
 }
 
 /* Buttons */
 .ai-number-predictor-btn {
-  padding: 0.6rem 1rem;
+  padding: 0.8rem 1.5rem;
   border: none;
   border-radius: 8px;
   font-size: 1rem;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.3s;
+  transition: all 0.3s ease;
+  background: #43a047;
+  color: #ffffff;
 }
 
-.ai-number-predictor-btn:not(.reset) {
-  background-color: #4f46e5;
-  color: #fff;
+[data-theme='dark'] .ai-number-predictor-btn {
+  background: #66bb6a;
+  color: #1a1a1a;
 }
 
-.ai-number-predictor-btn:not(.reset):hover {
-  background-color: #4338ca;
+.ai-number-predictor-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(67, 160, 71, 0.2);
 }
 
-.ai-number-predictor-btn.reset {
-  background-color: #e11d48;
-  color: #fff;
-  margin-top: 0.5rem;
+.ai-number-predictor-btn:disabled {
+  background: #cccccc;
+  cursor: not-allowed;
+  transform: none;
 }
 
-.ai-number-predictor-btn.reset:hover {
-  background-color: #be123c;
+[data-theme='dark'] .ai-number-predictor-btn:disabled {
+  background: #404040;
+  color: #888888;
 }
 
-/* Error */
+.ai-number-predictor-btn.try-again {
+  background: #2196f3;
+  margin-top: 1rem;
+}
+
+[data-theme='dark'] .ai-number-predictor-btn.try-again {
+  background: #42a5f5;
+  color: #ffffff;
+}
+
+/* Error Message */
 .ai-number-predictor-error {
-  color: #dc2626;
-  background-color: #fee2e2;
-  padding: 0.75rem 1rem;
-  border-radius: 6px;
-  font-size: 0.9rem;
-  margin-top: 0.5rem;
+  margin-top: 1rem;
+  padding: 1rem;
+  border-radius: 8px;
+  background: #ffebee;
+  color: #c62828;
+  font-weight: 500;
+}
+
+[data-theme='dark'] .ai-number-predictor-error {
+  background: #311b1b;
+  color: #ef5350;
 }
 
 /* Steps animation */
@@ -178,28 +252,82 @@ svg text {
   font-family: 'Segoe UI', sans-serif;
 }
 
-/* Result */
+/* Result Section */
 .ai-number-predictor-result {
   margin-top: 2rem;
-  background: #e0f2f1;
-  padding: 1rem;
-  border-radius: 10px;
+  padding: 2rem;
   text-align: center;
+  background: #e0f2f1;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   animation: scaleFade 0.6s ease-in-out;
+  transition: all 0.3s ease;
+}
+
+[data-theme='dark'] .ai-number-predictor-result {
+  background: #0d2621;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 .ai-result-label {
-  font-size: 1rem;
-  font-weight: bold;
-  color: #004d40;
+  display: block;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #00695c;
+  margin-bottom: 1rem;
+  transition: color 0.3s ease;
+}
+
+[data-theme='dark'] .ai-result-label {
+  color: #4db6ac;
 }
 
 .ai-result-number {
-  font-size: 2rem;
-  font-weight: 700;
-  color: #00796b;
   display: block;
-  margin: 0.5rem 0;
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #00897b;
+  margin: 1rem 0 1.5rem;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+[data-theme='dark'] .ai-result-number {
+  color: #26a69a;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Keep the previous Try Again button styling but enhance it */
+.ai-number-predictor-btn.try-again {
+  background: #00acc1;
+  color: white;
+  padding: 0.8rem 2rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  border-radius: 8px;
+  border: none;
+  margin-top: 0.5rem;
+}
+
+[data-theme='dark'] .ai-number-predictor-btn.try-again {
+  background: #00bcd4;
+  color: #1a1a1a;
+}
+
+.ai-number-predictor-btn.try-again:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 172, 193, 0.3);
+}
+
+@keyframes scaleFade {
+  0% {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 .ai-number-predictor-wait {

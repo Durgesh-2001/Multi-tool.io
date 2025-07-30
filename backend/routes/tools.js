@@ -220,9 +220,10 @@ router.get('/stats/overview', (req, res) => {
 // AI Number Prediction Tool (appears authentic)
 router.post('/ai-number-predictor', (req, res) => {
   const { guess } = req.body;
+  // Accept any integer (positive or negative)
   const userGuess = Number(guess);
-  if (isNaN(userGuess) || userGuess < 0 || userGuess > 99) {
-    return res.status(400).json({ error: 'Guess must be a number between 0 and 99.' });
+  if (typeof guess === 'undefined' || guess === null || guess === '' || isNaN(userGuess) || !/^[-]?\d+$/.test(String(guess))) {
+    return res.status(400).json({ error: 'Please enter a valid integer number!' });
   }
 
   // Enhanced AI jargon steps to match frontend
@@ -238,7 +239,8 @@ router.post('/ai-number-predictor', (req, res) => {
   ];
 
   // Always return the user's number as the prediction
-  const aiResult = `Prediction: ${userGuess}. Confidence: 99.9%`;
+  // Remove trailing full stop if present in prediction
+  const aiResult = `Prediction: ${userGuess} Confidence: 100%`;
 
   res.json({
     steps: aiThinkingSteps,
