@@ -7,6 +7,9 @@ import PaymentModal from '../PaymentModal/PaymentModal';
 import Login from '../../pages/Login/Login';
 import './Navbar.css';
 
+// Define the API base URL using the environment variable
+const API_BASE_URL = `${import.meta.env.VITE_BACKEND_URL}/api`;
+
 const Navbar = () => {
   const [user, setUser] = useState(null);
   const [credits, setCredits] = useState(0);
@@ -23,7 +26,8 @@ const Navbar = () => {
   // Move fetchUserStatus here so it's accessible everywhere in Navbar
   const fetchUserStatus = async (token) => {
     try {
-      const response = await fetch('/api/payment/status', {
+      // CORRECTED: Use the API_BASE_URL constant
+      const response = await fetch(`${API_BASE_URL}/payment/status`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (response.ok) {
@@ -31,6 +35,8 @@ const Navbar = () => {
         setCredits(data.credits);
         setIsProUser(data.isPro);
         setSubscriptionEnd(data.subscriptionEnd);
+      } else {
+        console.error('Failed to fetch user status:', response.status, response.statusText);
       }
     } catch (error) {
       console.error('Failed to fetch user status', error);
@@ -96,7 +102,8 @@ const Navbar = () => {
     setCancelMsg('');
     const token = localStorage.getItem('token');
     try {
-      const res = await fetch('/api/payment/cancel', {
+      // CORRECTED: Use the API_BASE_URL constant
+      const res = await fetch(`${API_BASE_URL}/payment/cancel`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -231,4 +238,4 @@ const Navbar = () => {
   );
 };
 
-export default Navbar; 
+export default Navbar;
