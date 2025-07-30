@@ -24,9 +24,6 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// --- Middleware ---
-
-// ✨ Production-Ready CORS Configuration
 const allowedOrigins = [
   'https://multi-tooldot-io.vercel.app',
   'http://localhost:5173',
@@ -35,26 +32,21 @@ const allowedOrigins = [
 
 const corsOptions = {
   origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps, curl requests)
-    // or if the origin is in the whitelist.
     if (!origin || allowedOrigins.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
       callback(new Error('Not allowed by CORS'));
     }
   },
-  credentials: true, // This allows cookies to be sent with requests
-  optionsSuccessStatus: 200 // For legacy browser compatibility
+  credentials: true, 
+  optionsSuccessStatus: 200 
 };
 
 app.use(cors(corsOptions));
-// --- End of CORS Configuration ---
-
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Configure multer for file uploads
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, 'uploads/');
@@ -66,12 +58,10 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
-// Create uploads directory if it doesn't exist
 if (!fs.existsSync('uploads')) {
   fs.mkdirSync('uploads');
 }
 
-// Serve static files from uploads directory
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Routes
@@ -89,10 +79,8 @@ app.use('/api/otp', otpRoutes);
 app.use('/api/tools', toolsRoutes);
 app.use('/api/payment', paymentRoutes);
 
-// Connect to MongoDB
 connectDB();
 
-// Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
   
@@ -105,7 +93,6 @@ app.use((err, req, res, next) => {
     }
   }
   
-  // Handle CORS errors specifically
   if (err.message === 'Not allowed by CORS') {
       return res.status(403).json({ error: 'Access denied by CORS policy.' });
   }
@@ -113,11 +100,10 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: 'Something went wrong!', details: err.message });
 });
 
-// 404 handler
 app.use('*', (_req, res) => {
   res.status(404).json({ error: 'Route not found' });
 });
 
 app.listen(PORT, () => {
-  console.log(`🚀 Multi-Tool.io Server running at http://localhost:${PORT}`);
+  console.log(`Multi-Tool.io Server running Successfully on port`);
 });
