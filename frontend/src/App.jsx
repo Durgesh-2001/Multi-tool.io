@@ -10,6 +10,7 @@ import Tools from './pages/Tools/Tools';
 import ResetPassword from './pages/ResetPassword/ResetPassword';
 import ComingSoon from './pages/ComingSoon/ComingSoon';
 import Pricing from './pages/Pricing/Pricing';
+import Profile from './pages/Profile/Profile';
 
 function App() {
   return (
@@ -27,6 +28,8 @@ function App() {
               <Route path="/tools" element={<Tools />} />
               <Route path="/coming-soon/:toolId" element={<ComingSoon />} />
               <Route path="/pricing" element={<Pricing />} />
+              <Route path="/profile" element={<Profile />} />
+              {/* Add more routes as needed */}
             </Routes>
           </div>
           <Footer />
