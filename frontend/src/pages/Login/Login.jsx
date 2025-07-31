@@ -5,7 +5,7 @@ import axios from 'axios';
 import { useTheme } from '../../context/ThemeContext';
 import { useNavigate } from 'react-router-dom';
 
-const Login = ({ setShowLogin, defaultMode }) => {
+const Login = ({ setShowLogin, onLoginComplete, defaultMode }) => {
   const { isDarkMode } = useTheme();
   const navigate = useNavigate();
   const [currState, setCurrState] = useState({
@@ -59,10 +59,10 @@ const Login = ({ setShowLogin, defaultMode }) => {
             localStorage.setItem('user', JSON.stringify(response.data.user));
             window.dispatchEvent(new Event('authChange'));
             setCurrState({ name: '', email: '', password: '', mobile: '' });
-            setTimeout(() => {
-              setShowLogin && setShowLogin(false);
-              navigate('/');
-            }, 1000);
+            // Close the login modal and notify parent
+            setShowLogin && setShowLogin(false);
+            onLoginComplete && onLoginComplete({ success: true, message: 'Login successful!' });
+            navigate('/');
           } else {
             setError('Authentication failed - No token received');
           }
@@ -116,12 +116,9 @@ const Login = ({ setShowLogin, defaultMode }) => {
         localStorage.setItem('token', res.data.token);
         localStorage.setItem('user', JSON.stringify(res.data.user || { name: 'User' }));
         window.dispatchEvent(new Event('authChange'));
-        setShowSuccess(true);
-        setTimeout(() => {
-          setShowSuccess(false);
-          setShowLogin && setShowLogin(false);
-          navigate('/');
-        }, 1000);
+        setShowLogin && setShowLogin(false);
+        onLoginComplete && onLoginComplete({ success: true, message: 'Login successful!' });
+        navigate('/');
       } else {
         setError(res.data.message || 'OTP verification failed');
       }
@@ -140,6 +137,7 @@ const Login = ({ setShowLogin, defaultMode }) => {
         window.dispatchEvent(new Event('authChange'));
         setCurrState({ name: '', email: '', password: '', mobile: '' });
         setShowLogin && setShowLogin(false);
+        onLoginComplete && onLoginComplete({ success: true, message: 'Login successful!' });
         navigate('/');
       } else {
         setError('Google authentication failed.');

@@ -1,137 +1,120 @@
+/* --- 1. MODERN & COHESIVE THEME PALETTE --- */
 :root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
+  /* Set base font for the entire application */
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  line-height: 1.6;
   font-weight: 400;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  
-  /* Light theme variables (default) */
-  --bg-color: #ffffff;
-  --text-color: #000000;
-  --card-bg: #f8f9fa;
-  --border-color: #e0e0e0;
-  --shadow-color: rgba(0, 0, 0, 0.1);
+
+  /* --- Light Theme (Default) --- */
+  --bg-color: #ffffff;             /* Clean white background */
+  --text-color: #1a202c;          /* Dark, readable text */
+  --card-bg: #f8f9fa;            /* Slightly off-white for cards */
+  --border-color: #e2e8f0;        /* Soft, non-intrusive border */
+  --shadow-color: rgba(45, 55, 71, 0.1);
   --input-bg: #ffffff;
-  --input-border: #cccccc;
-  --button-bg: #ffff00;
-  --button-hover: #ff9500;
-  --accent-color: #ff6b6b;
+  --input-border: #cbd5e1;
+  --accent-color: #ec5b00;         /* A vibrant blue for primary actions */
+  --accent-hover: #ff6b6b;         /* A darker shade for hover */
+  --button-text-color: #ffffff;
 }
 
+/* --- Dark Theme --- */
+[data-theme="dark"] {
+  --bg-color: #121212;             /* A deep, true black background */
+  --text-color: #f7fafc;          /* Bright, clear text */
+  --card-bg: #1a1a1a;            /* A subtle off-black for depth */
+  --border-color: #2d3748;        /* Low-contrast border */
+  --shadow-color: rgba(0, 0, 0, 0.2);
+  --input-bg: #2d3748;
+  --input-border: #4a5568;
+  --accent-color: #ff6b6b;         /* A slightly lighter blue for better contrast on dark */
+  --accent-hover: #ff6b6b;         /* A brighter shade for hover */
+  --button-text-color: #ffffff;
+}
+
+/* --- 2. GLOBAL RESETS & BODY STYLING --- */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  /* Apply smooth transitions to key properties */
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
 }
 
 body {
-  min-width: 100vw;
-  min-height: 100vh;
-  width: 100vw;
-  height: 100vh;
   background: var(--bg-color);
   color: var(--text-color);
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  margin: 0;
-  padding: 0;
   overflow-x: hidden;
-  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 #root {
-  width: 100vw;
-  height: 100vh;
-  margin: 0;
-  padding: 0;
-  background: var(--bg-color);
-  color: var(--text-color);
-  text-align: initial;
+  width: 100%;
+  min-height: 100vh;
 }
 
-/* Remove default button styles */
+/* --- 3. CUSTOM ELEMENT STYLING --- */
+
+/* Base button style */
 button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
   font-family: inherit;
-  color: var(--text-color);
+  font-weight: 600;
+  font-size: 1em;
+  padding: 0.6em 1.2em;
+  border-radius: 8px;
   cursor: pointer;
-  transition: border-color 0.25s;
-  background: none;
+  border: 1px solid transparent;
+  transition: background-color 0.2s ease, transform 0.2s ease;
 }
 
-button:hover {
+/* Default button variant */
+button.default {
+  background-color: var(--card-bg);
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+}
+button.default:hover {
   border-color: var(--accent-color);
 }
 
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+/* Primary action button variant */
+button.primary {
+  background-color: var(--accent-color);
+  color: var(--button-text-color);
+}
+button.primary:hover {
+  background-color: var(--accent-hover);
+  transform: translateY(-2px);
 }
 
-/* Custom scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: var(--card-bg);
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--border-color);
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: var(--accent-color);
-}
-
-/* Focus styles for accessibility */
-button:focus,
-input:focus,
-textarea:focus,
-select:focus {
+/* Accessibility focus ring */
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
   outline: 2px solid var(--accent-color);
   outline-offset: 2px;
 }
 
-/* Smooth transitions */
-* {
-  transition: background-color 0.3s ease, border-color 0.3s ease, transform 0.3s ease;
+
+/* --- 4. CUSTOM SCROLLBAR --- */
+::-webkit-scrollbar {
+  width: 10px;
 }
 
-/* Dark theme overrides */
-[data-theme="dark"] {
-  --bg-color: #1a1a1a;
-  --text-color: #ffffff;
-  --card-bg: #2d2d2d;
-  --border-color: #404040;
-  --shadow-color: rgba(0, 0, 0, 0.3);
-  --input-bg: #3d3d3d;
-  --input-border: #555555;
-  --button-bg: #f2ff00;
-  --button-hover: #fff702;
-  --accent-color: #ff6b6b;
+::-webkit-scrollbar-track {
+  background: var(--bg-color);
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #f4fd00;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
+::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 5px;
+  border: 2px solid var(--bg-color); /* Creates padding around thumb */
 }
 
-
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-color);
+}

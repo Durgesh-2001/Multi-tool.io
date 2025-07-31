@@ -1,159 +1,246 @@
-/* Pricing page specific styles (optional) */
-
-.pricing-page {
-  background: #f6f6f7;
-  min-height: 100vh;
-  padding-bottom: 3rem;
+/* --- Root Variables for a Modern UI --- */
+:root {
+  --pricing-bg-light: #f8f9fa;
+  --pricing-bg-dark: #121212;
+  --card-bg-light: #ffffff;
+  --card-bg-dark: #1a1a1a;
+  --text-primary-light: #1a202c;
+  --text-secondary-light: #5a6474;
+  --text-primary-dark: #f7fafc;
+  --text-secondary-dark: #a0aec0;
+  --border-light: #e8eaf0;
+  --border-dark: #333944;
+  --accent-color: #0070f3; /* A vibrant blue for primary actions */
+  --highlight-color: #8a3ffc; /* A distinct purple for the popular plan */
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
 }
 
+/* --- Page Container --- */
+.pricing-page {
+  font-family: var(--font-sans);
+  transition: background-color 0.3s ease;
+  padding: 4rem 1rem;
+}
+.pricing-page.light {
+  background: var(--pricing-bg-light);
+}
+.pricing-page.dark {
+  background: var(--pricing-bg-dark);
+}
+
+/* --- Back Button --- */
+.back-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+  background: none;
+  border: none;
+  color: var(--text-secondary-light);
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+.pricing-page.dark .back-button {
+    color: var(--text-secondary-dark);
+}
+.back-button:hover {
+    color: var(--accent-color);
+}
+
+/* --- Main Header --- */
+.pricing-header {
+  font-size: 3.5rem;
+  font-weight: 800;
+  letter-spacing: -0.05em;
+  text-align: center;
+  margin-bottom: 1.5rem;
+  background: -webkit-linear-gradient(45deg, #0070f3, #8a3ffc 80%);
+  -webkit-text-fill-color: transparent;
+}
+.pricing-page.dark .pricing-header {
+    color: var(--text-primary-dark);
+    background: -webkit-linear-gradient(45deg, #3b82f6, #c084fc 80%);
+    -webkit-text-fill-color: transparent;
+}
+
+/* --- Plans Grid --- */
 .plans-view {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 2.5rem 2rem;
-  justify-content: center;
-  max-width: 1100px;
-  margin: 0 auto;
-  margin-top: 2.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+  max-width: 1200px;
+  margin: 4rem auto 0 auto;
 }
 
-@media (max-width: 1100px) {
-  .plans-view {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 2rem 1.2rem;
-  }
-}
-@media (max-width: 700px) {
-  .plans-view {
-    grid-template-columns: 1fr;
-    gap: 1.2rem;
-  }
-}
-
+/* --- Base Plan Card Style --- */
 .plan-card-new {
-  background: #fff;
-  border-radius: 18px;
-  border: 1.5px solid #e5e7eb;
-  min-width: 260px;
-  max-width: 320px;
-  min-height: 420px;
   display: flex;
   flex-direction: column;
-  align-items: stretch;
-  padding: 2.2rem 2rem 2rem 2rem;
+  padding: 2rem;
+  border-radius: 16px;
+  border: 1px solid var(--border-light);
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
   position: relative;
-  transition: box-shadow 0.2s, border 0.2s, transform 0.2s;
-  margin: 0 auto;
-  text-align: left;
-  box-shadow: 0 2px 8px 0 rgba(0,0,0,0.04);
+  overflow: hidden;
 }
 
+.plan-card-new:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
+}
+
+/* Light & Dark Mode for Cards */
+.plan-card-new.light {
+  background-color: var(--card-bg-light);
+  color: var(--text-primary-light);
+}
+.plan-card-new.dark {
+  background-color: var(--card-bg-dark);
+  color: var(--text-primary-dark);
+  border-color: var(--border-dark);
+}
+.plan-card-new.dark:hover {
+    border-color: #4a5568;
+}
+
+/* --- Highlighted (Popular) Plan Card --- */
 .plan-card-new.highlight {
-  border: 2.5px solid #16a34a;
-  z-index: 2;
+  border: 2px solid transparent;
+  background-image: linear-gradient(var(--card-bg-light), var(--card-bg-light)), 
+                    linear-gradient(to right, var(--accent-color), var(--highlight-color));
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
+  transform: scale(1.05);
+}
+.plan-card-new.highlight.dark {
+    background-image: linear-gradient(var(--card-bg-dark), var(--card-bg-dark)), 
+                      linear-gradient(to right, var(--accent-color), var(--highlight-color));
+}
+.plan-card-new.highlight:hover {
+    transform: scale(1.05) translateY(-8px);
 }
 
-.plan-card-new .tag {
+/* --- Most Popular Tag --- */
+.tag {
   position: absolute;
-  top: 0.7rem;
-  right: 0.7rem;
-  background: #16a34a;
-  color: #fff;
-  padding: 2px 10px;
-  border-radius: 6px;
-  font-size: 0.78rem;
+  top: 1.5rem;
+  right: 1.5rem;
+  background: var(--highlight-color);
+  color: white;
+  padding: 0.3rem 0.8rem;
+  border-radius: 99px;
+  font-size: 0.8rem;
   font-weight: 700;
-  letter-spacing: 0.5px;
-  box-shadow: 0 2px 8px rgba(22,163,74,0.12);
-  z-index: 3;
 }
 
+/* --- Card Content --- */
 .plan-card-new h3 {
-  color: inherit;
-  font-size: 1.3rem;
+  font-size: 1.5rem;
   font-weight: 700;
   margin-bottom: 0.5rem;
 }
 
 .price-new {
-  font-size: 2.1rem;
+  font-size: 3rem;
   font-weight: 800;
-  margin-bottom: 0.2rem;
-  color: inherit;
-  text-align: left;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
 }
 
 .slashed-price-animated {
-  text-decoration: line-through;
-  margin-left: 0.7rem;
-  font-size: 1.1rem;
-  color: #bdbdbd;
+  font-size: 1.5rem;
   font-weight: 500;
+  text-decoration: line-through;
+  opacity: 0.6;
 }
 
 .plan-card-new hr {
   border: none;
-  border-top: 1px solid #e5e7eb;
-  margin: 1.2rem 0 1.2rem 0;
+  height: 1px;
+  background-color: var(--border-light);
+  margin: 1.5rem 0;
+}
+.plan-card-new.dark hr {
+    background-color: var(--border-dark);
 }
 
+/* Feature List */
 .features-new {
   list-style: none;
   padding: 0;
-  margin: 0 0 1.5rem 0;
-  width: 100%;
-  text-align: left;
-  color: inherit;
+  margin: 0 0 2rem 0;
+  flex-grow: 1; /* Pushes the button to the bottom */
 }
 
 .features-new li {
-  font-size: 1.08rem;
-  line-height: 2.1rem;
-  padding-left: 0;
-  margin-bottom: 0.1rem;
-  border-left: none;
-  background: transparent;
-  min-height: 2.1rem;
-  position: relative;
-  color: inherit;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  font-size: 1rem;
+  color: var(--text-secondary-light);
+}
+.plan-card-new.dark .features-new li {
+    color: var(--text-secondary-dark);
 }
 
-.features-new li:last-child {
-  margin-bottom: 0;
-}
-
-.plan-btn-new {
-  background: #111;
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  padding: 0.7rem 0;
+.features-new li::before {
+  content: '✓';
+  color: var(--accent-color);
   font-weight: 700;
-  cursor: pointer;
-  margin: 1.5rem 0 0.5rem 0;
-  font-size: 1.1rem;
+  font-size: 1.2rem;
+}
+
+/* --- Plan Button --- */
+.plan-btn-new {
   width: 100%;
-  box-shadow: 0 1px 4px rgba(22,163,74,0.08);
-  transition: background 0.2s, box-shadow 0.2s;
+  padding: 1rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: var(--accent-color);
+  color: white;
 }
 
 .plan-btn-new:hover {
-  background: #16a34a;
-  color: #fff;
+  transform: scale(1.03);
+  box-shadow: 0 10px 20px -5px rgba(0, 112, 243, 0.3);
 }
 
-.pricing-page.dark .plan-card-new,
-.plan-card-new.dark {
-  background: #23272f;
-  color: #fff;
-  border-color: #333;
+/* Button style for non-highlighted cards */
+.plan-card-new:not(.highlight) .plan-btn-new {
+  background-color: var(--card-bg-light);
+  color: var(--text-primary-light);
+  border: 1px solid var(--border-light);
+}
+.plan-card-new.dark:not(.highlight) .plan-btn-new {
+    background-color: var(--card-bg-dark);
+    color: var(--text-primary-dark);
+    border: 1px solid var(--border-dark);
+}
+.plan-card-new:not(.highlight):hover .plan-btn-new {
+    background-color: var(--accent-color);
+    color: white;
+    border-color: var(--accent-color);
+    box-shadow: 0 10px 20px -5px rgba(0, 112, 243, 0.3);
 }
 
-.pricing-page.dark .plan-card-new .tag,
-.plan-card-new.dark .tag {
-  background: #16a34a;
-  color: #fff;
+/* --- Responsive Adjustments --- */
+@media (max-width: 768px) {
+  .pricing-header {
+    font-size: 2.5rem;
+  }
+  .plan-card-new.highlight {
+    transform: scale(1); /* Disable scaling on mobile to save space */
+  }
+  .plan-card-new.highlight:hover {
+    transform: translateY(-8px);
+  }
 }
-
-.pricing-page.dark .slashed-price-animated {
-  color: #888;
-} 

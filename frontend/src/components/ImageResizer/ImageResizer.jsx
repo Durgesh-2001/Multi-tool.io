@@ -157,7 +157,6 @@ const ImageResizer = () => {
         </div>
       )}
       <div className="resizer-header">
-        <h2>��️ Image Resizer</h2>
         <p>Resize, crop, and convert your images with precision and ease</p>
       </div>
 
