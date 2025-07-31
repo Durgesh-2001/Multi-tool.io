@@ -94,7 +94,7 @@ npm install nodemailer twilio crypto
 ## Frontend Integration
 
 The frontend includes:
-- Reset password page at `/reset-password`
+- Reset password page at `/reset`
 - Support for both email and SMS methods
 - Automatic token/code detection from URL parameters
 - Mobile number field in registration form

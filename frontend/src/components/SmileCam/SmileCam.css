@@ -1,611 +1,282 @@
+/* --- SmileCam Main Styles (Theme-Integrated) --- */
+
+/* 1. Main Component Layout */
 .smilecam {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 2rem;
-  background: var(--bg-color);
-  color: var(--text-color);
+  width: 100%;
+  max-width: 900px;
+  margin: 2rem auto;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
 }
 
 .smilecam-container {
-  background: var(--card-bg);
-  border-radius: 20px;
-  padding: 2rem;
-  border: 2px solid var(--border-color);
-  box-shadow: 0 8px 32px var(--shadow-color);
+  width: 100%;
+  background: var(--card-bg); /* Uses global card background */
+  color: var(--text-color); /* Uses global text color */
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  box-shadow: 0 8px 30px var(--shadow-color);
+  overflow: hidden;
+  padding: 1.5rem;
 }
 
 .smilecam-title {
   font-size: 2rem;
   font-weight: 700;
-  margin-bottom: 1rem;
-  color: var(--text-color);
   text-align: center;
+  color: var(--text-color);
 }
 
 .smilecam-subtitle {
-  font-size: 1.1rem;
-  color: var(--text-color);
-  opacity: 0.8;
   text-align: center;
-  margin-bottom: 2rem;
-  line-height: 1.6;
+  color: #6c757d;
+  margin-bottom: 1.5rem;
 }
 
+/* 2. Camera Section */
 .camera-section {
-  margin-bottom: 2rem;
+  width: 100%;
 }
 
 .camera-container {
   position: relative;
   width: 100%;
-  max-width: 640px;
-  margin: 0 auto;
-  border-radius: 15px;
+  aspect-ratio: 16 / 9;
+  background-color: var(--bg-color); /* Uses global main background */
+  border-radius: 12px;
   overflow: hidden;
-  background: var(--card-bg);
-  border: 2px solid var(--border-color);
-  box-shadow: 0 8px 32px var(--shadow-color);
-  min-height: 400px;
-}
-
-/* Camera Start Screen */
-.camera-start {
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 3rem 2rem;
-  text-align: center;
-  min-height: 400px;
+  box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--border-color);
 }
 
-.camera-icon {
-  font-size: 4rem;
-  margin-bottom: 1rem;
-  opacity: 0.7;
-}
-
-.camera-start h3 {
-  font-size: 1.5rem;
-  font-weight: 600;
-  margin-bottom: 0.5rem;
-  color: var(--text-color);
-}
-
-.camera-start p {
-  color: var(--text-color);
-  opacity: 0.8;
-  margin-bottom: 2rem;
-}
-
-.start-button {
-  padding: 1rem 2rem;
-  background: var(--accent-color);
-  color: white;
-  border: none;
-  border-radius: 25px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  font-size: 1.1rem;
-  box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
-}
-
-.start-button:hover {
-  background: #ee5a24;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
-}
-
-/* Camera Error Screen */
-.camera-error {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 3rem 2rem;
-  text-align: center;
-  min-height: 400px;
-}
-
-.error-icon {
-  font-size: 3rem;
-  margin-bottom: 1rem;
-  color: #ff6b6b;
-}
-
-.camera-error p {
-  color: var(--text-color);
-  margin-bottom: 2rem;
-  font-size: 1.1rem;
-}
-
-.retry-button {
-  padding: 0.75rem 1.5rem;
-  background: var(--accent-color);
-  color: white;
-  border: none;
-  border-radius: 20px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.retry-button:hover {
-  background: #ee5a24;
-  transform: translateY(-1px);
-}
-
-/* Camera View */
-.camera-view {
-  position: relative;
+.camera-video,
+.captured-image {
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
-  min-height: 400px;
-}
-
-.camera-video {
-  width: 100%;
-  height: 100%;
-  min-height: 400px;
   object-fit: cover;
-  border-radius: 15px;
-  background: #000;
+  opacity: 0;
+  transition: opacity 0.5s ease;
 }
 
-/* Smile Detection Indicator */
+.camera-video.visible,
+.captured-image.visible {
+  opacity: 1;
+}
+
+.camera-placeholder {
+  color: #6c757d;
+  font-weight: 500;
+}
+
+.camera-error {
+  color: #dc3545;
+  font-weight: 600;
+  padding: 1rem;
+  text-align: center;
+}
+
+/* 3. Overlays and Indicators */
+.processing-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(5px);
+  padding: 1rem;
+  text-align: center;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
 .smile-indicator {
   position: absolute;
-  top: 1rem;
-  left: 1rem;
+  bottom: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(8px);
+  color: #ffffff;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  background: rgba(0, 0, 0, 0.7);
-  padding: 0.5rem 1rem;
-  border-radius: 20px;
-  backdrop-filter: blur(10px);
-  z-index: 10;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
 }
 
 .smile-dot {
   width: 12px;
   height: 12px;
   border-radius: 50%;
-  background: #ff6b6b;
-  animation: pulse 2s infinite;
+  background-color: #6c757d;
+  transition: background-color 0.3s ease;
 }
 
 .smile-dot.smile-detected {
-  background: #51cf66;
-  animation: smilePulse 0.5s ease-in-out;
+  background-color: #28a745;
+  box-shadow: 0 0 8px #28a745;
 }
 
-.smile-text {
-  color: white;
-  font-size: 0.9rem;
-  font-weight: 600;
-}
-
-@keyframes pulse {
-  0%, 100% {
-    opacity: 1;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 0.7;
-    transform: scale(1.1);
-  }
-}
-
-@keyframes smilePulse {
-  0% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.3);
-  }
-  100% {
-    transform: scale(1);
-  }
-}
-
-.camera-controls {
-  position: absolute;
-  bottom: 2rem;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  gap: 1rem;
-  align-items: center;
-  z-index: 10;
-}
-
-.switch-camera-button {
-  padding: 0.75rem 1rem;
-  background: rgba(0, 0, 0, 0.7);
-  color: white;
-  border: none;
-  border-radius: 20px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  backdrop-filter: blur(10px);
-}
-
-.switch-camera-button:hover {
-  background: rgba(0, 0, 0, 0.8);
-  transform: translateY(-1px);
-}
-
-.capture-button {
-  padding: 1rem 2rem;
-  background: var(--accent-color);
-  color: white;
-  border: none;
-  border-radius: 25px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  font-size: 1.1rem;
-  box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
-}
-
-.capture-button:hover:not(:disabled) {
-  background: #ee5a24;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
-}
-
-.capture-button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-  transform: none;
-  box-shadow: none;
-}
-
-/* Auto Capture Button */
-.auto-capture-button {
-  padding: 0.75rem 1.5rem;
-  background: rgba(0, 0, 0, 0.7);
-  color: white;
-  border: none;
-  border-radius: 20px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  backdrop-filter: blur(10px);
-  font-size: 0.9rem;
-}
-
-.auto-capture-button:hover {
-  background: rgba(0, 0, 0, 0.8);
-  transform: translateY(-1px);
-}
-
-.auto-capture-button.active {
-  background: #51cf66;
-  box-shadow: 0 4px 15px rgba(81, 207, 102, 0.3);
-}
-
-.auto-capture-button.active:hover {
-  background: #40c057;
-  box-shadow: 0 6px 20px rgba(81, 207, 102, 0.4);
-}
-
-/* Captured View */
-.captured-view {
-  padding: 2rem;
+/* 4. Analysis Result Card */
+.analysis-result {
+  margin: 1rem auto 0;
+  padding: 1rem;
+  border-radius: 8px;
   text-align: center;
-}
-
-.captured-image {
-  width: 100%;
-  max-width: 500px;
-  height: auto;
-  border-radius: 15px;
-  box-shadow: 0 8px 32px var(--shadow-color);
-  border: 2px solid var(--border-color);
-  margin-bottom: 2rem;
-}
-
-.capture-controls {
-  display: flex;
-  gap: 1rem;
-  justify-content: center;
-  flex-wrap: wrap;
-  margin-bottom: 2rem;
-}
-
-.retake-button,
-.process-button,
-.download-button {
-  padding: 0.75rem 1.5rem;
-  border: none;
-  border-radius: 20px;
+  max-width: 95%;
   font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  font-size: 1rem;
-}
-
-.retake-button {
-  background: var(--button-bg);
-  color: white;
-}
-
-.retake-button:hover {
-  background: #495057;
-  transform: translateY(-1px);
-}
-
-.process-button {
-  background: var(--accent-color);
-  color: white;
-}
-
-.process-button:hover:not(:disabled) {
-  background: #ee5a24;
-  transform: translateY(-1px);
-}
-
-.process-button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-  transform: none;
-}
-
-.download-button {
-  background: #51cf66;
-  color: white;
-}
-
-.download-button:hover {
-  background: #40c057;
-  transform: translateY(-1px);
-}
-
-.processing-result {
-  padding: 1.5rem;
-  border-radius: 15px;
-  margin: 1rem 0;
-  text-align: center;
-}
-
-.processing-result.success {
-  background: rgba(81, 207, 102, 0.1);
-  border: 2px solid #51cf66;
-  color: #51cf66;
-}
-
-.processing-result.error {
-  background: rgba(255, 107, 107, 0.1);
-  border: 2px solid #ff6b6b;
-  color: #ff6b6b;
-}
-
-.processing-result h4 {
-  font-size: 1.2rem;
-  font-weight: 600;
-  margin-bottom: 1rem;
-}
-
-.expression-details {
-  text-align: left;
-  max-width: 300px;
-  margin: 0 auto;
-}
-
-.expression-details p {
-  margin: 0.5rem 0;
-  font-size: 1rem;
-}
-
-.camera-info {
-  margin-top: 2rem;
-  padding: 1.5rem;
-  background: var(--card-bg);
-  border-radius: 15px;
+  background-color: var(--card-bg);
   border: 1px solid var(--border-color);
 }
 
-.camera-info h3 {
-  font-size: 1.3rem;
+.analysis-result.success {
+  color: #28a745;
+  border-color: #28a745;
+}
+
+.analysis-result.error {
+  color: #dc3545;
+  border-color: #dc3545;
+}
+
+.analysis-result p {
+  margin: 0.25rem 0;
+}
+
+
+/* 5. Controls Section */
+.controls-section {
+  padding: 1.5rem 0 0.5rem;
+  display: flex;
+  justify-content: center;
+}
+
+.live-controls,
+.captured-controls {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.control-button {
+  padding: 0.75rem 1.5rem;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 1rem;
   font-weight: 600;
-  margin-bottom: 1rem;
+  cursor: pointer;
+  background-color: var(--input-bg);
   color: var(--text-color);
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.control-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  border-color: var(--accent-color);
+  box-shadow: 0 4px 15px var(--shadow-color);
+}
+.control-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
 }
 
-.camera-info ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
+.control-button.start,
+.control-button.process {
+  background-color: var(--accent-color);
+  color: var(--button-text-color);
+  border-color: transparent;
+}
+.control-button.start:hover:not(:disabled),
+.control-button.process:hover:not(:disabled) {
+  background-color: var(--accent-hover);
+}
+.control-button.stop {
+  background-color: #dc3545;
+  color: #ffffff;
+  border-color: transparent;
+}
+.control-button.active {
+  background-color: #28a745;
+  color: #ffffff;
+  border-color: transparent;
 }
 
-.camera-info li {
-  padding: 0.5rem 0;
-  color: var(--text-color);
-  opacity: 0.8;
-  position: relative;
-  padding-left: 1.5rem;
-}
-
-.camera-info li::before {
-  content: '✨';
-  position: absolute;
-  left: 0;
-  top: 0.5rem;
-  font-size: 0.9rem;
-}
-
+/* 6. Modals */
 .modal-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.8);
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1000;
-  animation: modalFadeIn 0.3s ease-out;
 }
-
 .modal {
   background: var(--card-bg);
-  border-radius: 20px;
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
   padding: 2rem;
-  max-width: 400px;
-  width: 90%;
+  border-radius: 12px;
   text-align: center;
-  border: 2px solid var(--border-color);
-  box-shadow: 0 8px 32px var(--shadow-color);
+  width: 90%;
+  max-width: 400px;
 }
-
-@keyframes modalFadeIn {
-  from {
-    opacity: 0;
-    transform: scale(0.9);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
 .modal h2 {
-  font-size: 1.5rem;
-  font-weight: 600;
-  margin-bottom: 1rem;
-  color: var(--text-color);
+  margin-bottom: 0.5rem;
 }
-
 .modal p {
-  color: var(--text-color);
-  opacity: 0.8;
-  margin-bottom: 2rem;
-  line-height: 1.6;
+  color: #6c757d;
+  margin-bottom: 1.5rem;
 }
-
 .modal-btn-group {
   display: flex;
   flex-direction: column;
   gap: 1rem;
 }
-
 .modal-btn {
-  padding: 1rem 1.5rem;
-  background: var(--accent-color);
-  color: white;
+  width: 100%;
+  padding: 1rem;
+  font-size: 1.1rem;
+  background-color: var(--accent-color);
+  color: var(--button-text-color);
   border: none;
-  border-radius: 15px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  font-size: 1rem;
 }
-
 .modal-btn:hover {
-  background: #ee5a24;
-  transform: translateY(-2px);
+  background-color: var(--accent-hover);
 }
 
-@media (max-width: 768px) {
+/* 7. Media Queries for Responsiveness */
+@media (max-width: 600px) {
   .smilecam {
+    padding: 0;
+    margin: 1rem 0;
+  }
+  .smilecam-container {
+    border-radius: 0;
     padding: 1rem;
   }
-
-  .camera-container {
-    min-height: 350px;
-  }
-
-  .camera-start,
-  .camera-error {
-    padding: 2rem 1rem;
-    min-height: 350px;
-  }
-
-  .camera-video {
-    min-height: 350px;
-  }
-
-  .camera-controls {
-    bottom: 1rem;
+  .live-controls, .captured-controls {
     gap: 0.5rem;
   }
-
-  .capture-controls {
-    gap: 0.5rem;
-  }
-
-  .retake-button,
-  .process-button,
-  .download-button {
-    padding: 0.5rem 1rem;
-    font-size: 0.9rem;
-  }
-
-  .modal {
-    margin: 1rem;
-    padding: 1.5rem;
-  }
-
-  .modal-btn-group {
-    gap: 0.75rem;
-  }
-
-  .modal-btn {
-    padding: 0.75rem 1rem;
+  .control-button {
+    padding: 0.6rem 1rem;
     font-size: 0.9rem;
   }
 }
-
-@media (max-width: 480px) {
-  .camera-container {
-    min-height: 300px;
-  }
-
-  .camera-start,
-  .camera-error {
-    padding: 1.5rem 1rem;
-    min-height: 300px;
-  }
-
-  .camera-video {
-    min-height: 300px;
-  }
-
-  .camera-icon {
-    font-size: 3rem;
-  }
-
-  .camera-start h3 {
-    font-size: 1.3rem;
-  }
-
-  .capture-button {
-    padding: 0.75rem 1.5rem;
-    font-size: 1rem;
-  }
-
-  .switch-camera-button {
-    padding: 0.5rem 0.75rem;
-    font-size: 0.8rem;
-  }
-
-  .auto-capture-button {
-    padding: 0.5rem 1rem;
-    font-size: 0.8rem;
-  }
-
-  .smile-indicator {
-    top: 0.5rem;
-    left: 0.5rem;
-    padding: 0.25rem 0.75rem;
-  }
-
-  .smile-text {
-    font-size: 0.8rem;
-  }
-} 

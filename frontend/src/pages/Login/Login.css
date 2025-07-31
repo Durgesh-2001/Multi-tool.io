@@ -190,7 +190,6 @@
 
 .error-message,
 .success-message {
-  opacity: 0;
   transform: translateY(-10px);
   transition: opacity 0.4s, transform 0.4s;
 }
@@ -210,12 +209,16 @@
 }
 
 .success-message {
-  background-color: rgba(0, 255, 0, 0.15);
-  color: #00cc00;
-  padding: 10px 15px;
-  margin-bottom: 15px;
-  border-radius: 8px;
-  font-size: 0.9rem;
+  background-color: #f0fdf4;  /* A very light green background */
+  color: #155724;            /* A dark, high-contrast green text */
+  border: 1px solid #bbf7d0;  /* A soft green border */
+  
+  padding: 1rem;              /* 16px of space inside */
+  margin-bottom: 1rem;        /* 16px of space below the message */
+  border-radius: 8px;         /* Standard rounded corners */
+  
+  font-weight: 500;           /* Medium font weight is easy to read */
+  text-align: center;         /* Center the text horizontally */
 }
 
 /* Password field and icon placement */

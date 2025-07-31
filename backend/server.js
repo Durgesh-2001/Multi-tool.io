@@ -105,5 +105,5 @@ app.use('*', (_req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`Multi-Tool.io Server running Successfully on port`);
+  console.log(`Multi-Tool.io Server running Successfully`);
 });

@@ -1,104 +1,11 @@
 import express from 'express';
+import { authMiddleware } from '../middleware/auth.js';
+import { deductCredits } from '../controllers/userController.js';
 
 const router = express.Router();
 
-// Tool database - in a real app, this would come from a database
-const TOOLS_DATABASE = {
-  'video-editor': {
-    id: 'video-editor',
-    title: 'Video Editor',
-    description: 'Advanced video editing with AI-powered features for creating professional content',
-    icon: '🎬',
-    available: false,
-    progress: '75%',
-    eta: 'Q1 2024',
-    features: [
-      'AI-powered video enhancement',
-      'Auto-caption generation',
-      'Background removal',
-      'Video stabilization',
-      'Multi-track editing',
-      'Real-time preview',
-      'Export in multiple formats',
-      'Cloud storage integration'
-    ],
-    category: 'media',
-    difficulty: 'medium',
-    team: ['Frontend', 'Backend', 'AI/ML'],
-    techStack: ['React', 'Node.js', 'FFmpeg', 'TensorFlow']
-  },
-  'voice-cloner': {
-    id: 'voice-cloner',
-    title: 'Voice Cloner',
-    description: 'Clone and modify voices using advanced AI technology for content creation',
-    icon: '🎤',
-    available: false,
-    progress: '45%',
-    eta: 'Q2 2024',
-    features: [
-      'Voice cloning from samples',
-      'Real-time voice modification',
-      'Multiple voice models',
-      'Emotion control',
-      'Language translation',
-      'Text-to-speech synthesis',
-      'Voice style transfer',
-      'Batch processing'
-    ],
-    category: 'audio',
-    difficulty: 'hard',
-    team: ['AI/ML', 'Backend', 'Frontend'],
-    techStack: ['Python', 'TensorFlow', 'React', 'WebRTC']
-  },
-  'code-generator': {
-    id: 'code-generator',
-    title: 'Code Generator',
-    description: 'Generate code from natural language descriptions using AI assistance',
-    icon: '💻',
-    available: false,
-    progress: '30%',
-    eta: 'Q3 2024',
-    features: [
-      'Multi-language support',
-      'Code explanation',
-      'Bug detection',
-      'Performance optimization',
-      'Documentation generation',
-      'Code refactoring',
-      'Test case generation',
-      'IDE integration'
-    ],
-    category: 'development',
-    difficulty: 'hard',
-    team: ['AI/ML', 'Backend', 'Frontend'],
-    techStack: ['OpenAI API', 'React', 'Node.js', 'Monaco Editor']
-  },
-  'data-analyzer': {
-    id: 'data-analyzer',
-    title: 'Data Analyzer',
-    description: 'AI-powered data analysis and visualization for insights and reports',
-    icon: '📊',
-    available: false,
-    progress: '20%',
-    eta: 'Q4 2024',
-    features: [
-      'Automated insights',
-      'Interactive charts',
-      'Predictive analytics',
-      'Data cleaning',
-      'Report generation',
-      'Real-time dashboards',
-      'Data import/export',
-      'Collaborative analysis'
-    ],
-    category: 'analytics',
-    difficulty: 'medium',
-    team: ['Data Science', 'Frontend', 'Backend'],
-    techStack: ['Python', 'D3.js', 'React', 'Pandas']
-  }
-};
+router.post('/deduct-credits', authMiddleware, deductCredits);
 
-// Get all tools
 router.get('/', (req, res) => {
   try {
     const tools = Object.values(TOOLS_DATABASE);

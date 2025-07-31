@@ -135,9 +135,34 @@ const AudioConverter = () => {
 
     try {
       const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('You must be logged in to use this feature');
+      }
+
       const headers = {
         'Authorization': `Bearer ${token}`
       };
+
+      // First, try to deduct credits
+      try {
+        const deductResponse = await fetch(`${API_BASE_URL}/tools/deduct-credits`, {
+          method: 'POST',
+          headers
+        });
+
+        if (!deductResponse.ok) {
+          const errorData = await deductResponse.json();
+          if (deductResponse.status === 403) {
+            setIsPaymentModalOpen(true);
+          }
+          throw new Error(errorData.message || 'Failed to process credits');
+        }
+
+        // Trigger UI update for credits
+        window.dispatchEvent(new Event('authChange'));
+      } catch (deductError) {
+        throw new Error(deductError.message || 'Failed to process credits. Please try again.');
+      }
 
       if (conversionType === 'youtube') {
         if (!youtubeUrl.trim()) {
@@ -158,8 +183,8 @@ const AudioConverter = () => {
           });
         }, 500);
 
-        // First, try to get video info to check if conversion is possible
         try {
+          // Get video info to check if conversion is possible
           const response = await axios.post(`${API_BASE_URL}/audio/youtube`, {
             url: youtubeUrl,
             format: format
@@ -187,23 +212,14 @@ const AudioConverter = () => {
           setYoutubeUrl('');
           window.dispatchEvent(new Event('authChange'));
 
-        } catch (downloadError) {
-          // If the download failed, try to get the error message
-          if (downloadError.response?.status === 503 || downloadError.response?.status === 500) {
-            // Try to get the error response as JSON
-            try {
-              const errorResponse = await axios.post(`${API_BASE_URL}/audio/youtube`, {
-                url: youtubeUrl,
-                format: format
-              }, { headers });
-              // This shouldn't reach here for successful requests
-            } catch (errorInfo) {
-              if (errorInfo.response?.data) {
-                throw new Error(errorInfo.response.data.error || errorInfo.response.data.message || 'YouTube conversion failed');
-              }
-            }
+        } catch (error) {
+          // If the conversion failed, try to get the error message
+          if (error.response?.status === 503 || error.response?.status === 500) {
+            throw new Error('YouTube conversion service temporarily unavailable. Please try again later.');
+          } else if (error.response?.data) {
+            throw new Error(error.response.data.error || error.response.data.message || 'YouTube conversion failed');
           }
-          throw downloadError;
+          throw error;
         }
 
       } else {

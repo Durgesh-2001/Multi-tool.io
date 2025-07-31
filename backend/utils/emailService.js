@@ -1,33 +1,32 @@
 import nodemailer from 'nodemailer';
 import crypto from 'crypto';
 
-// Create a test account using Ethereal Email (free for testing)
-// In production, use Gmail SMTP or other email service
+// Creates a test account with Ethereal for development
 const createTestAccount = async () => {
   try {
     const testAccount = await nodemailer.createTestAccount();
     return nodemailer.createTransport({
       host: 'smtp.ethereal.email',
       port: 587,
-      secure: false,
+      secure: false, // true for 465, false for other ports
       auth: {
-        user: testAccount.user,
-        pass: testAccount.pass,
+        user: testAccount.user, // generated ethereal user
+        pass: testAccount.pass, // generated ethereal password
       },
     });
   } catch (error) {
-    console.error('Failed to create test account:', error);
+    console.error('Failed to create Ethereal test account:', error);
     return null;
   }
 };
 
-// For production, use Gmail SMTP
+// Creates a transporter for a real email service like Gmail for production
 const createGmailTransporter = () => {
   return nodemailer.createTransport({
     service: 'gmail',
     auth: {
       user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS, // Use app password for Gmail
+      pass: process.env.EMAIL_PASS, // Use an "App Password" for Gmail
     },
   });
 };
@@ -35,7 +34,7 @@ const createGmailTransporter = () => {
 export const sendPasswordResetEmail = async (email, resetToken, resetUrl) => {
   try {
     let transporter;
-    
+
     if (process.env.NODE_ENV === 'production' && process.env.EMAIL_USER) {
       transporter = createGmailTransporter();
     } else {
@@ -47,25 +46,23 @@ export const sendPasswordResetEmail = async (email, resetToken, resetUrl) => {
     }
 
     const mailOptions = {
-      from: process.env.EMAIL_USER || 'noreply@multitool.io',
+      from: process.env.EMAIL_USER || '"Multi-Tool.io" <noreply@multitool.io>',
       to: email,
       subject: 'Password Reset Request - Multi-Tool.io',
       html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <h2 style="color: #333;">Password Reset Request</h2>
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px;">
+          <h2 style="color: #333; text-align: center;">Password Reset Request</h2>
           <p>Hello,</p>
           <p>You requested a password reset for your Multi-Tool.io account.</p>
-          <p>Click the button below to reset your password:</p>
+          <p>Click the button below to set a new password:</p>
           <div style="text-align: center; margin: 30px 0;">
             <a href="${resetUrl}" 
-               style="background-color: #000; color: #fff; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">
+               style="background-color: #ec5b00; color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">
               Reset Password
             </a>
           </div>
-          <p>Or copy and paste this link in your browser:</p>
-          <p style="word-break: break-all; color: #666;">${resetUrl}</p>
           <p>This link will expire in 1 hour.</p>
-          <p>If you didn't request this reset, please ignore this email.</p>
+          <p>If you didn't request this, please ignore this email.</p>
           <hr style="margin: 30px 0; border: none; border-top: 1px solid #eee;">
           <p style="color: #666; font-size: 12px;">
             Multi-Tool.io - Smarter Tools. Simpler Life.
@@ -74,16 +71,23 @@ export const sendPasswordResetEmail = async (email, resetToken, resetUrl) => {
       `,
     };
 
-    let info = await transporter.sendMail(mailOptions);
-    
-    if (process.env.NODE_ENV !== 'production') {
-      // Log the Ethereal preview URL
-      if (nodemailer.getTestMessageUrl) {
-        console.log('Ethereal email preview URL:', nodemailer.getTestMessageUrl(info));
-      }
+    const info = await transporter.sendMail(mailOptions);
+    let previewUrl = null;
+
+    // In development, get the Ethereal preview URL
+    if (process.env.NODE_ENV !== 'production' && nodemailer.getTestMessageUrl) {
+      previewUrl = nodemailer.getTestMessageUrl(info);
+      console.log('Ethereal email preview URL:', previewUrl);
     }
     
-    return { success: true, messageId: info.messageId };
+    // --- MODIFICATION ---
+    // Return an object that includes the previewUrl
+    return {
+      success: true,
+      messageId: info.messageId,
+      previewUrl: previewUrl, // This will be the URL in dev, and null in prod
+    };
+
   } catch (error) {
     console.error('Email sending failed:', error);
     throw new Error('Failed to send password reset email');
@@ -92,4 +96,4 @@ export const sendPasswordResetEmail = async (email, resetToken, resetUrl) => {
 
 export const generateResetToken = () => {
   return crypto.randomBytes(32).toString('hex');
-}; 
+};

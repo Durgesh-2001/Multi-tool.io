@@ -3,7 +3,7 @@ import './Login.css';
 import { GoogleLogin } from '@react-oauth/google';
 import axios from 'axios';
 import { useTheme } from '../../context/ThemeContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 const Login = ({ setShowLogin, onLoginComplete, defaultMode }) => {
   const { isDarkMode } = useTheme();
@@ -262,6 +262,11 @@ const Login = ({ setShowLogin, onLoginComplete, defaultMode }) => {
                   {showPassword ? '🙈' : '👁️'}
                 </button>
               </div>
+             {isLogin && (
+                <Link to="/reset" className="forgot-password-link" style={{ display: 'block', marginTop: '10px', color: '#0066cc', textDecoration: 'none', fontSize: '14px' }}>
+                  Forgot Password?
+                </Link>
+              )}
             </div>
             {!isLogin && (
               <div className="form-group">

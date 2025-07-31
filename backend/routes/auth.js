@@ -5,10 +5,35 @@ import { OAuth2Client } from 'google-auth-library';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { sendPasswordResetEmail, generateResetToken } from '../utils/emailService.js';
+import { authMiddleware } from '../middleware/auth.js';
 
 const router = express.Router();
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 const JWT_SECRET = process.env.JWT_SECRET;
+
+// Get user profile - Protected route
+router.get('/me', authMiddleware, async (req, res) => {
+  try {
+    // User is already verified and attached by authMiddleware
+    res.json({
+      success: true,
+      user: {
+        id: req.user._id,
+        name: req.user.name,
+        email: req.user.email,
+        mobile: req.user.mobile,
+        isProUser: req.user.isProUser,
+        credits: req.user.credits,
+        subscriptionPlan: req.user.subscriptionPlan || (req.user.isProUser ? 'PRO' : 'FREE'),
+        subscriptionEnd: req.user.subscriptionEndDate,
+        createdAt: req.user.createdAt
+      }
+    });
+  } catch (error) {
+    console.error('Profile fetch error:', error);
+    res.status(500).json({ success: false, message: 'Error fetching user profile' });
+  }
+});
 
 // Simple mobile validation function
 const validateMobile = (mobile) => {
@@ -113,32 +138,50 @@ router.post('/login', async (req, res) => {
 
 // Forgot password (email only)
 router.post('/forgot', async (req, res) => {
-  const { identifier } = req.body;
-  if (!identifier) return res.status(400).json({ error: 'Email required' });
+  const { email } = req.body;
+  if (!email) return res.status(400).json({ error: 'Email required' });
   
   try {
-    const user = await User.findOne({ email: identifier });
+    const user = await User.findOne({ email: email });
     if (!user) {
+      // Security practice: Don't reveal if an email is registered or not.
+      // Still send a success-like response.
       return res.json({ message: 'If your account exists, you will receive a password reset link.' });
     }
     
     const resetToken = generateResetToken();
-    const resetUrl = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/reset-password?token=${resetToken}`;
+    const FRONTEND_URL = process.env.VITE_FRONTEND_URL || process.env.FRONTEND_URL || 'http://localhost:5173';
+    const resetUrl = `${FRONTEND_URL}/reset?token=${resetToken}`;
     
     // Store reset token with expiry (1 hour)
     user.resetToken = resetToken;
     user.resetTokenExpiry = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
     await user.save();
     
-    // Send email
-    await sendPasswordResetEmail(identifier, resetToken, resetUrl);
-    
-    return res.json({ message: 'Password reset link sent to your email.' });
+    // --- MODIFICATION START ---
+    // Send email and capture the returned info
+    const emailInfo = await sendPasswordResetEmail(email, resetToken, resetUrl);
+
+// ADD THIS LOG
+console.log('--- Email Info from Ethereal ---', emailInfo);
+
+const responsePayload = {
+  message: 'Password reset link sent to your email.',
+  previewUrl: process.env.NODE_ENV === 'development' ? emailInfo.previewUrl : null
+};
+
+// ADD THIS LOG
+console.log('--- Sending this JSON response to frontend ---', responsePayload);
+
+// Return the preview URL in development for easy testing
+return res.json(responsePayload);
+
   } catch (err) {
     console.error('Password reset error:', err);
     res.status(500).json({ error: 'Failed to process password reset request' });
   }
 });
+
 
 // Reset password (email only)
 router.post('/reset', async (req, res) => {
@@ -201,4 +244,4 @@ router.get('/google-client-id', (req, res) => {
   res.json({ clientId: process.env.GOOGLE_CLIENT_ID || '' });
 });
 
-export default router; 
+export default router;

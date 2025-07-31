@@ -1,221 +1,145 @@
-// (same imports)
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import axios from 'axios';
+import * as faceapi from 'face-api.js';
 import './SmileCam.css';
 import PaymentModal from '../PaymentModal/PaymentModal';
 
 const SmileCam = () => {
+  // --- State Management ---
   const [stream, setStream] = useState(null);
   const [capturedImage, setCapturedImage] = useState(null);
   const [isCapturing, setIsCapturing] = useState(false);
   const [cameraError, setCameraError] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [processingResult, setProcessingResult] = useState(null);
-  const [cameraMode, setCameraMode] = useState('environment');
+  const [cameraMode, setCameraMode] = useState('user');
   const [isMobile, setIsMobile] = useState(false);
   const [showModal, setShowModal] = useState(true);
   const [modalStep, setModalStep] = useState(1);
-  const [selectedDevice, setSelectedDevice] = useState('');
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
-
   const [isActive, setIsActive] = useState(false);
   const [isSmileDetected, setIsSmileDetected] = useState(false);
   const [autoCaptureMode, setAutoCaptureMode] = useState(false);
+  const [modelsLoaded, setModelsLoaded] = useState(false);
 
-  const videoRef = useRef();
-  const canvasRef = useRef();
+  // --- Refs ---
+  const videoRef = useRef(null);
+  const canvasRef = useRef(null);
   const streamRef = useRef(null);
+  const detectionIntervalRef = useRef(null);
+
   const API_BASE_URL = `${import.meta.env.VITE_BACKEND_URL}/api`;
 
-  useEffect(() => {
-    const checkMobile = () => {
-      const userAgent = navigator.userAgent || navigator.vendor || window.opera;
-      return /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent.toLowerCase());
-    };
-    setIsMobile(checkMobile());
-  }, []);
+  // --- Core Functions (defined with useCallback) ---
 
-  useEffect(() => {
-    let interval;
-    if (isActive && autoCaptureMode) {
-      interval = setInterval(() => {
-        const shouldDetectSmile = Math.random() > 0.85;
-        if (shouldDetectSmile && !isSmileDetected) {
-          setIsSmileDetected(true);
-          setTimeout(() => {
-            handleCapture();
-            setIsSmileDetected(false);
-          }, 500);
-        }
-      }, 1000);
-    }
-
-    return () => {
-      if (interval) clearInterval(interval);
-    };
-  }, [isActive, isSmileDetected, autoCaptureMode]);
-
-  const startCamera = async () => {
-    try {
-      setCameraError('');
-      const constraints = {
-        video: {
-          facingMode: cameraMode,
-          width: { ideal: 1280 },
-          height: { ideal: 720 }
-        }
-      };
-
-      const mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
-      setStream(mediaStream);
-      streamRef.current = mediaStream;
-      setIsActive(true);
-
-      if (videoRef.current) {
-        videoRef.current.srcObject = mediaStream;
-      }
-    } catch (error) {
-      console.error('Camera access error:', error);
-      setCameraError('Failed to access camera. Please check permissions and try again.');
-
-      if (cameraMode === 'environment' && isMobile) {
-        setCameraMode('user');
-        setTimeout(() => startCamera(), 1000);
-      }
-    }
-  };
-
-  const stopCamera = () => {
-    if (stream) {
-      stream.getTracks().forEach(track => track.stop());
-      setStream(null);
-    }
+  const stopCamera = useCallback(() => {
     if (streamRef.current) {
       streamRef.current.getTracks().forEach(track => track.stop());
       streamRef.current = null;
     }
-    if (videoRef.current) {
-      videoRef.current.srcObject = null;
+    if (detectionIntervalRef.current) {
+      clearInterval(detectionIntervalRef.current);
     }
+    setStream(null);
     setIsActive(false);
     setIsSmileDetected(false);
-  };
+  }, []);
 
-  const switchCamera = () => {
-    if (stream) {
+  const startCamera = useCallback(async (mode) => {
+    if (streamRef.current) {
       stopCamera();
-      setCameraMode(cameraMode === 'environment' ? 'user' : 'environment');
-      setTimeout(() => startCamera(), 500);
     }
-  };
+    setCameraError('');
+    const currentCameraMode = mode || cameraMode;
+    const constraints = { video: { facingMode: currentCameraMode, width: { ideal: 1280 }, height: { ideal: 720 } } };
 
-  const capturePhoto = () => {
-    if (!videoRef.current || !canvasRef.current) return;
+    try {
+      const mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
+      streamRef.current = mediaStream;
+      setStream(mediaStream);
+      setIsActive(true);
+    } catch (error) {
+      console.error('Camera access error:', error);
+      setCameraError('Failed to access camera. Please check permissions.');
+    }
+  }, [cameraMode, stopCamera]);
+
+  const handleCapture = useCallback(() => {
+    if (!videoRef.current || !canvasRef.current || isCapturing) return;
+
+    setIsCapturing(true);
+    setProcessingResult(null);
 
     const video = videoRef.current;
     const canvas = canvasRef.current;
-    const context = canvas.getContext('2d');
-
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
+    const context = canvas.getContext('2d');
     context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
     canvas.toBlob((blob) => {
       setCapturedImage(blob);
       setIsCapturing(false);
-    }, 'image/jpeg', 0.8);
-  };
+      stopCamera();
+    }, 'image/jpeg', 0.9);
+  }, [isCapturing, stopCamera]);
 
-  const handleCapture = () => {
-    setProcessingResult(null);
-    setIsCapturing(true);
-    setTimeout(capturePhoto, 100);
-  };
+  const processFinalImage = useCallback(async (imageBlob) => {
+    if (!modelsLoaded) return { success: false, error: "AI Models not loaded." };
 
-  const handlePaymentSuccess = () => {
-    setIsPaymentModalOpen(false);
-    processImage();
-  };
+    try {
+      const image = await faceapi.bufferToImage(imageBlob);
 
-  const processImage = async () => {
+      const detections = await faceapi
+        .detectSingleFace(image, new faceapi.TinyFaceDetectorOptions())
+        .withFaceExpressions();
+
+      if (detections) {
+        const smileValue = detections.expressions.happy > 0.7 ? 'Yes' : 'No';
+        const confidenceValue = (detections.expressions.happy * 100).toFixed(0);
+        return {
+          success: true,
+          expressions: { smile: smileValue, confidence: confidenceValue },
+        };
+      } else {
+        return { success: false, error: 'Could not detect a face in the image.' };
+      }
+    } catch (error) {
+      console.error('Error in processFinalImage:', error);
+      return { success: false, error: 'Failed to analyze the image.' };
+    }
+  }, [modelsLoaded]);
+
+  const processImage = useCallback(async () => {
     if (!capturedImage) return;
     setIsProcessing(true);
-    setProcessingResult(null);
 
-    try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        setProcessingResult({
-          success: false,
-          error: 'Please log in to analyze images'
+    const analysisResult = await processFinalImage(capturedImage);
+    
+    setProcessingResult(analysisResult);
+
+    const token = localStorage.getItem('token');
+    if (token && analysisResult.success) {
+      try {
+        await axios.post(`${API_BASE_URL}/tools/deduct-credits`, {}, {
+          headers: { 'Authorization': `Bearer ${token}` }
         });
-        return;
+        window.dispatchEvent(new Event('authChange'));
+      } catch (error) {
+        console.error("Credit deduction failed:", error);
       }
-
-      const formData = new FormData();
-      formData.append('image', capturedImage, 'capture.jpg');
-
-      const response = await axios.post(`${API_BASE_URL}/smilecam/capture`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-          'Authorization': `Bearer ${token}`
-        }
-      });
-
-      setProcessingResult(response.data);
-      window.dispatchEvent(new Event('authChange'));
-    } catch (error) {
-      console.error('Image processing error:', error);
-      if (error.response?.status === 401) {
-        setProcessingResult({
-          success: false,
-          error: 'Please log in to analyze images'
-        });
-      } else if (error.response?.status === 402) {
-        setProcessingResult({
-          success: false,
-          error: 'You have insufficient credits or your free quota is over. Please upgrade your plan to continue using SmileCam.'
-        });
-        // Don't auto-open modal
-      } else {
-        setProcessingResult({
-          success: false,
-          error: error.response?.data?.error || 'Failed to process image'
-        });
-      }
-    } finally {
-      setIsProcessing(false);
     }
-  };
 
-  const retakePhoto = async () => {
+    setIsProcessing(false);
+  }, [capturedImage, processFinalImage, API_BASE_URL]);
+
+  const retakePhoto = useCallback(() => {
     setCapturedImage(null);
     setProcessingResult(null);
-    try {
-      if (!stream) {
-        const constraints = {
-          video: {
-            facingMode: cameraMode
-          }
-        };
-        const newStream = await navigator.mediaDevices.getUserMedia(constraints);
-        setStream(newStream);
-        if (videoRef.current) {
-          videoRef.current.srcObject = newStream;
-        }
-      } else {
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream;
-          videoRef.current.play();
-        }
-      }
-    } catch (error) {
-      console.error('Error reinitializing camera:', error);
-      setCameraError('Failed to reinitialize camera. Please refresh the page.');
-    }
-  };
+    startCamera();
+  }, [startCamera]);
 
-  const downloadImage = () => {
+  const downloadImage = useCallback(() => {
     if (!capturedImage) return;
     const url = URL.createObjectURL(capturedImage);
     const link = document.createElement('a');
@@ -225,34 +149,90 @@ const SmileCam = () => {
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
-  };
+  }, [capturedImage]);
 
-  const handleDeviceSelect = (device) => {
-    setSelectedDevice(device);
+  const switchCamera = useCallback(() => {
+    const newMode = cameraMode === 'user' ? 'environment' : 'user';
+    setCameraMode(newMode);
+    startCamera(newMode);
+  }, [cameraMode, startCamera]);
+  
+  const toggleAutoCapture = () => setAutoCaptureMode(prev => !prev);
+
+  const handleDeviceSelect = useCallback((device) => {
     if (device === 'mobile') {
       setModalStep(2);
     } else {
-      setCameraMode('user');
       setShowModal(false);
-      setTimeout(() => startCamera(), 300);
+      startCamera('user');
     }
-  };
+  }, [startCamera]);
 
-  const handleCameraSelect = (mode) => {
-    setCameraMode(mode);
+  const handleCameraSelect = useCallback((mode) => {
     setShowModal(false);
-    setTimeout(() => startCamera(), 300);
-  };
+    startCamera(mode);
+  }, [startCamera]);
 
-  const toggleAutoCapture = () => {
-    setAutoCaptureMode(!autoCaptureMode);
-  };
+  const handlePaymentSuccess = () => setIsPaymentModalOpen(false);
+
+  // --- useEffect Hooks ---
 
   useEffect(() => {
+    const checkMobile = () => /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(navigator.userAgent.toLowerCase());
+    setIsMobile(checkMobile());
+
+    const loadModels = async () => {
+      try {
+        await Promise.all([
+          faceapi.nets.tinyFaceDetector.loadFromUri('/models'),
+          faceapi.nets.faceLandmark68Net.loadFromUri('/models'),
+          faceapi.nets.faceExpressionNet.loadFromUri('/models'),
+        ]);
+        setModelsLoaded(true);
+      } catch (error) {
+        console.error("Failed to load face-api models:", error);
+        setCameraError("Could not load AI models. Please refresh.");
+      }
+    };
+    loadModels();
+
     return () => {
-      stopCamera();
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(track => track.stop());
+      }
+      if (detectionIntervalRef.current) {
+        clearInterval(detectionIntervalRef.current);
+      }
     };
   }, []);
+
+  useEffect(() => {
+    if (stream && videoRef.current) {
+      videoRef.current.srcObject = stream;
+    }
+  }, [stream]);
+
+  useEffect(() => {
+    if (isActive && modelsLoaded && autoCaptureMode) {
+      detectionIntervalRef.current = setInterval(async () => {
+        if (videoRef.current && !videoRef.current.paused) {
+          const detections = await faceapi
+            .detectAllFaces(videoRef.current, new faceapi.TinyFaceDetectorOptions())
+            .withFaceExpressions();
+
+          const smile = detections[0]?.expressions.happy > 0.8;
+          setIsSmileDetected(smile);
+          if (smile) {
+            handleCapture();
+          }
+        }
+      }, 700);
+    } else {
+      if (detectionIntervalRef.current) clearInterval(detectionIntervalRef.current);
+    }
+    return () => clearInterval(detectionIntervalRef.current);
+  }, [isActive, modelsLoaded, autoCaptureMode, handleCapture]);
+
 
   return (
     <div className="smilecam">
@@ -261,17 +241,10 @@ const SmileCam = () => {
         onClose={() => setIsPaymentModalOpen(false)}
         onPaymentSuccess={handlePaymentSuccess}
       />
-
-      {processingResult && !processingResult.success && processingResult.error && (
-        <div style={{ background: '#ffeaea', color: '#b91c1c', padding: '1rem', borderRadius: 8, margin: '0 auto 16px auto', textAlign: 'center', fontWeight: 600, maxWidth: 600 }}>
-          {processingResult.error}
-        </div>
-      )}
-
       {showModal && (
         <div className="modal-overlay">
           <div className="modal">
-            {modalStep === 1 && (
+            {modalStep === 1 ? (
               <>
                 <h2>Welcome to SmileCam</h2>
                 <p>Please confirm your device type:</p>
@@ -280,14 +253,13 @@ const SmileCam = () => {
                   <button className="modal-btn" onClick={() => handleDeviceSelect('mobile')}>📱 Mobile</button>
                 </div>
               </>
-            )}
-            {modalStep === 2 && (
+            ) : (
               <>
                 <h2>Choose Camera</h2>
                 <p>Which camera would you like to use?</p>
                 <div className="modal-btn-group">
-                  <button className="modal-btn" onClick={() => handleCameraSelect('user')}>🤳 Front Camera</button>
-                  <button className="modal-btn" onClick={() => handleCameraSelect('environment')}>📷 Back Camera</button>
+                  <button className="modal-btn" onClick={() => handleCameraSelect('user')}>🤳 Front</button>
+                  <button className="modal-btn" onClick={() => handleCameraSelect('environment')}>📷 Back</button>
                 </div>
               </>
             )}
@@ -297,129 +269,71 @@ const SmileCam = () => {
 
       <div className="smilecam-container">
         <div className="smilecam-title">📸 SmileCam</div>
-        <div className="smilecam-subtitle">
-          AI-powered camera that automatically captures photos when you smile
-        </div>
+        <div className="smilecam-subtitle">AI-powered camera that captures photos when you smile.</div>
 
         <div className="camera-section">
           <div className="camera-container">
-            {!stream && !capturedImage && (
-              <div className="camera-start">
-                <div className="camera-icon">📸</div>
-                <h3>Start Camera</h3>
-                <p>Click the button below to start your camera</p>
-                <button className="start-button" onClick={startCamera}>
-                  Start Camera
-                </button>
+            {cameraError && <div className="camera-error">{cameraError}</div>}
+            
+            <video ref={videoRef} autoPlay playsInline muted className={`camera-video ${!capturedImage && isActive ? 'visible' : ''}`} />
+            
+            {capturedImage && <img src={URL.createObjectURL(capturedImage)} alt="Captured" className="captured-image visible" />}
+
+            {!isActive && !capturedImage && (
+              <div className="camera-placeholder">
+                {!modelsLoaded ? "Loading AI Models..." : "Start camera to begin"}
               </div>
             )}
+            
+            <canvas ref={canvasRef} style={{ display: 'none' }} />
+            
+            {isProcessing && <div className="processing-overlay"><span>Processing...</span></div>}
 
-            {cameraError && (
-              <div className="camera-error">
-                <div className="error-icon">⚠️</div>
-                <p>{cameraError}</p>
-                <button className="retry-button" onClick={startCamera}>
-                  Try Again
-                </button>
+            {isActive && (
+              <div className="smile-indicator">
+                <span className={`smile-dot ${isSmileDetected ? 'smile-detected' : ''}`}></span>
+                {autoCaptureMode ? (isSmileDetected ? 'Smile!' : 'Detecting...') : 'Ready'}
               </div>
             )}
+          </div>
 
-            {stream && !capturedImage && (
-              <div className="camera-view">
-                <video
-                  ref={videoRef}
-                  autoPlay
-                  playsInline
-                  muted
-                  className="camera-video"
-                />
+          {processingResult && (
+            <div className={`analysis-result ${processingResult.success ? 'success' : 'error'}`}>
+              {processingResult.success ? (
+                <>
+                  <p>Smile Detected: {processingResult.expressions.smile}</p>
+                  <p>Confidence: {processingResult.expressions.confidence}%</p>
+                </>
+              ) : (
+                <p>{processingResult.error}</p>
+              )}
+            </div>
+          )}
 
-                {isActive && autoCaptureMode && (
-                  <div className="smile-indicator">
-                    <div className={`smile-dot ${isSmileDetected ? 'smile-detected' : ''}`}></div>
-                    <span className="smile-text">
-                      {isSmileDetected ? '😊 Smile Detected!' : '👀 Looking for smiles...'}
-                    </span>
-                  </div>
-                )}
+          <div className="controls-section">
+            {!isActive && !capturedImage ? (
+              <button className="control-button start" onClick={() => startCamera(cameraMode)} disabled={!modelsLoaded}>
+                {modelsLoaded ? 'Start Camera' : 'Loading Models...'}
+              </button>
+            ) : null}
 
-                <div className="camera-controls">
-                  {isMobile && (
-                    <button className="switch-camera-button" onClick={switchCamera}>
-                      {cameraMode === 'environment' ? '📱 Front' : '📷 Rear'}
-                    </button>
-                  )}
-
-                  <button 
-                    className="capture-button"
-                    onClick={handleCapture}
-                    disabled={isCapturing}
-                  >
-                    {isCapturing ? 'Capturing...' : '📸 Capture'}
-                  </button>
-
-                  <button 
-                    className={`auto-capture-button ${autoCaptureMode ? 'active' : ''}`}
-                    onClick={toggleAutoCapture}
-                  >
-                    {autoCaptureMode ? '🤖 Auto ON' : '🤖 Auto OFF'}
-                  </button>
-                </div>
+            {isActive && (
+              <div className="live-controls">
+                <button className="control-button" onClick={handleCapture} disabled={isCapturing}>📸 Capture</button>
+                {isMobile && <button className="control-button" onClick={switchCamera}>🔄 Switch</button>}
+                <button className={`control-button ${autoCaptureMode ? 'active' : ''}`} onClick={toggleAutoCapture}>🤖 Auto</button>
+                <button className="control-button stop" onClick={stopCamera}>⏹️ Stop</button>
               </div>
             )}
 
             {capturedImage && (
-              <div className="captured-view">
-                <img 
-                  src={URL.createObjectURL(capturedImage)} 
-                  alt="Captured" 
-                  className="captured-image"
-                />
-
-                <div className="capture-controls">
-                  <button className="retake-button" onClick={retakePhoto}>
-                    🔄 Retake
-                  </button>
-
-                  <button 
-                    className="process-button"
-                    onClick={processImage}
-                    disabled={isProcessing}
-                  >
-                    {isProcessing ? 'Processing...' : '🔍 Analyze'}
-                  </button>
-
-                  <button className="download-button" onClick={downloadImage}>
-                    💾 Download
-                  </button>
-                </div>
+              <div className="captured-controls">
+                <button className="control-button" onClick={retakePhoto}>🔄 Retake</button>
+                <button className="control-button process" onClick={processImage} disabled={isProcessing}>🔍 Analyze</button>
+                <button className="control-button" onClick={downloadImage}>💾 Download</button>
               </div>
             )}
-
-            {processingResult && !isPaymentModalOpen && processingResult.success && (
-              <div className="processing-result success">
-                <h4>Analysis Complete!</h4>
-                <div className="expression-details">
-                  <p><strong>Smile Detected:</strong> {processingResult.expressions.smile}</p>
-                  <p><strong>Confidence:</strong> {processingResult.expressions.confidence}%</p>
-                </div>
-              </div>
-            )}
-
-            <canvas ref={canvasRef} style={{ display: 'none' }} />
           </div>
-        </div>
-
-        <div className="camera-info">
-          <h3>📸 SmileCam Features</h3>
-          <ul>
-            <li>Real-time camera capture</li>
-            <li>Automatic smile detection</li>
-            <li>Mobile-optimized (rear/front camera support)</li>
-            <li>Facial expression analysis</li>
-            <li>High-quality image capture</li>
-            <li>Download captured photos</li>
-          </ul>
         </div>
       </div>
     </div>

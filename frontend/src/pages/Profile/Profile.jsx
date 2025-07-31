@@ -1,63 +1,119 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import './Profile.css';
 import { useTheme } from '../../context/ThemeContext';
 
+// --- Sub-components for better structure ---
+
+const InfoRow = ({ label, value, className = '' }) => (
+  <tr>
+    <td className="label">{label}:</td>
+    <td className={`value ${className}`}>{value}</td>
+  </tr>
+);
+
+// --- FIX: Corrected the logic for displaying credits ---
+const CreditsDisplay = ({ plan, credits }) => {
+  // The logic now explicitly checks if the plan is NOT one of the Pro plans.
+  // This is more robust than checking for just "FREE".
+  const isPro = ['Weekly', 'Super', 'Pro', 'Pro+'].includes(plan);
+
+  if (isPro) {
+    return <span className="status-badge unlimited">∞ Unlimited</span>;
+  }
+  
+  // For any other case (including "Free"), display the actual credit amount.
+  return <span className={credits <= 0 ? 'credits-zero' : ''}>{credits}</span>;
+};
+
+
+const SubscriptionStatus = ({ plan }) => (
+  <span className={`status-badge ${plan !== 'FREE' ? 'active' : 'free'}`}>
+    {plan !== 'FREE' ? 'ACTIVE' : 'FREE'}
+  </span>
+);
+
+const CancelSubscription = ({ onCancel, loading, isDarkMode }) => {
+  const [showWarning, setShowWarning] = useState(false);
+
+  if (!showWarning) {
+    return (
+      <button className="cancel-btn" onClick={() => setShowWarning(true)} disabled={loading}>
+        Cancel Subscription
+      </button>
+    );
+  }
+
+  return (
+    <div className={`cancel-warning-box ${isDarkMode ? 'dark' : 'light'}`}>
+      <strong>Warning:</strong> Are you sure you want to cancel? You will lose all Pro features immediately.
+      <div className="warning-actions">
+        <button className="confirm-btn" onClick={onCancel} disabled={loading}>
+          {loading ? 'Cancelling...' : 'Confirm Cancel'}
+        </button>
+        <button className="keep-btn" onClick={() => setShowWarning(false)} disabled={loading}>
+          Keep Subscription
+        </button>
+      </div>
+    </div>
+  );
+};
+
+
+// --- Main Profile Component ---
+
 const Profile = () => {
-  const [user, setUser] = useState({});
+  const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [showCancelWarning, setShowCancelWarning] = useState(false);
-  const [cancelMsg, setCancelMsg] = useState('');
+  const [error, setError] = useState('');
+  const [cancelMsg, setCancelMsg] = useState({ text: '', type: '' });
   const [cancelLoading, setCancelLoading] = useState(false);
 
-  const token = localStorage.getItem('token');
   const { isDarkMode } = useTheme();
-
   const API_BASE_URL = import.meta.env.VITE_BACKEND_URL;
-  useEffect(() => {
-    const fetchData = async () => {
-      if (!token) {
-        setUser({});
-        setLoading(false);
-        return;
-      }
-      setLoading(true);
-      setError(null);
-      try {
-        // Fetch user info with subscription details
-        const userRes = await fetch(`${API_BASE_URL}/api/auth/me`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        if (!userRes.ok) throw new Error('Failed to fetch user profile');
-        const userData = await userRes.json();
-        
-        if (!userData.success) {
-          throw new Error(userData.message || 'Failed to fetch user data');
-        }
 
-        // Get the actual user data from the response
-        const userInfo = userData.user;
-        
-        // Set user data with proper subscription status
-        setUser({
-          ...userInfo,
-          subscriptionPlan: userInfo.subscriptionPlan || 'FREE',
-          credits: userInfo.credits || 0,
-          isProUser: userInfo.isProUser || false,
-          subscriptionEndDate: userInfo.subscriptionEndDate ? new Date(userInfo.subscriptionEndDate) : null
-        });
-      } catch (err) {
-        setUser({});
-        setError(err.message);
-      }
+  const fetchData = useCallback(async () => {
+    const token = localStorage.getItem('token');
+    if (!token) {
       setLoading(false);
-    };
+      setError('You are not logged in.');
+      return;
+    }
+
+    setLoading(true);
+    setError('');
+
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/auth/me`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.message || 'Failed to fetch user profile');
+      }
+
+      setUser({
+        ...data.user,
+        subscriptionPlan: data.user.subscriptionPlan || 'FREE',
+        isProUser: data.user.isProUser || false,
+        subscriptionEndDate: data.user.subscriptionEndDate ? new Date(data.user.subscriptionEndDate) : null
+      });
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  }, [API_BASE_URL]);
+
+  useEffect(() => {
     fetchData();
-  }, [token, API_BASE_URL]);
+  }, [fetchData]);
 
   const handleCancelSubscription = async () => {
     setCancelLoading(true);
-    setCancelMsg('');
+    setCancelMsg({ text: '', type: '' });
+    const token = localStorage.getItem('token');
+
     try {
       const res = await fetch(`${API_BASE_URL}/api/payment/cancel`, {
         method: 'POST',
@@ -69,149 +125,51 @@ const Profile = () => {
       const data = await res.json();
       
       if (res.ok) {
-        // Update user state with the response data or fallback to defaults
-        setUser(prev => ({
-          ...prev,
-          isProUser: false,
-          subscriptionPlan: 'FREE',
-          credits: data.credits || 150,
-          subscriptionEndDate: null
-        }));
-        setCancelMsg('Your subscription has been cancelled successfully. Your account has been reverted to FREE plan.');
-        // Dispatch auth change to update UI everywhere
-        window.dispatchEvent(new Event('authChange'));
+        setCancelMsg({ text: 'Subscription cancelled successfully.', type: 'success' });
+        await fetchData(); 
       } else {
-        setCancelMsg(data.message || 'Failed to cancel subscription. Please contact support if this persists.');
+        throw new Error(data.message || 'Failed to cancel subscription.');
       }
     } catch (err) {
-      console.error('Subscription cancellation error:', err);
-      setCancelMsg('An error occurred while cancelling your subscription. Please try again or contact support.');
+      setCancelMsg({ text: err.message, type: 'error' });
     } finally {
       setCancelLoading(false);
-      // Only hide the warning if cancellation was successful
-      if (!error) {
-        setTimeout(() => setShowCancelWarning(false), 2000);
-      }
     }
   };
 
-  if (loading) return <div className={`loading ${isDarkMode ? 'dark' : 'light'}`}>Loading...</div>;
-  if (error) return <div className={`loading ${isDarkMode ? 'dark' : 'light'}`}>Error: {error}</div>;
+  if (loading) return <div className={`loading ${isDarkMode ? 'dark' : 'light'}`}>Loading Profile...</div>;
+  if (error) return <div className={`loading error ${isDarkMode ? 'dark' : 'light'}`}>{error}</div>;
+  if (!user) return <div className={`loading ${isDarkMode ? 'dark' : 'light'}`}>Please log in to view your profile.</div>;
 
   return (
-    <div className={`profileContainer ${isDarkMode ? 'dark' : 'light'}`}>
-      <h2 className={`heading ${isDarkMode ? 'dark' : 'light'}`}>Profile</h2>
-      <div className="cardsWrapper">
-        <div className={`card ${isDarkMode ? 'dark' : 'light'}`}>
-          <h3 className={`cardTitle ${isDarkMode ? 'dark' : 'light'}`}>Basic Info</h3>
-          <table className={`infoTable ${isDarkMode ? 'dark' : 'light'}`}>
+    <div className={`profile-container ${isDarkMode ? 'dark' : ''}`}>
+      <h2 className="profile-heading">Profile</h2>
+      <div className="cards-wrapper">
+        <div className={`profile-card ${isDarkMode ? 'dark' : ''}`}>
+          <h3 className="card-title">Account Details</h3>
+          <table className="info-table">
             <tbody>
-              <tr>
-                <td className={`label ${isDarkMode ? 'dark' : 'light'}`}>Name:</td>
-                <td className={`value ${isDarkMode ? 'dark' : 'light'}`}>{user.name}</td>
-              </tr>
-              <tr>
-                <td className={`label ${isDarkMode ? 'dark' : 'light'}`}>Mobile:</td>
-                <td className={`value ${isDarkMode ? 'dark' : 'light'}`}>{user.mobile || 'N/A'}</td>
-              </tr>
-              <tr>
-                <td className={`label ${isDarkMode ? 'dark' : 'light'}`}>Email:</td>
-                <td className={`value ${isDarkMode ? 'dark' : 'light'}`}>{user.email}</td>
-              </tr>
-              <tr>
-                <td className={`label ${isDarkMode ? 'dark' : 'light'}`}>Plan:</td>
-                <td className={`value ${isDarkMode ? 'dark' : 'light'}`}>
-                  <span style={{ 
-                    color: user.subscriptionPlan !== 'FREE' ? '#16a34a' : '#71717a',
-                    fontWeight: 'bold'
-                  }}>
-                    {user.subscriptionPlan || 'FREE'}
-                  </span>
-                </td>
-              </tr>
-              <tr>
-                <td className={`label ${isDarkMode ? 'dark' : 'light'}`}>Credits:</td>
-                <td className={`value ${isDarkMode ? 'dark' : 'light'}`}>
-                  {user.subscriptionPlan !== 'FREE' ? '∞ Unlimited' : user.credits}
-                </td>
-              </tr>
-              <tr>
-                <td className={`label ${isDarkMode ? 'dark' : 'light'}`}>Status:</td>
-                <td className={`value ${isDarkMode ? 'dark' : 'light'}`}>
-                  <span style={{ 
-                    color: user.subscriptionPlan !== 'FREE' ? '#16a34a' : '#71717a',
-                    fontWeight: 'bold'
-                  }}>
-                    {user.subscriptionPlan !== 'FREE' ? 'ACTIVE' : 'FREE'}
-                  </span>
-                </td>
-              </tr>
+              <InfoRow label="Name" value={user.name || 'N/A'} />
+              <InfoRow label="Email" value={user.email || 'N/A'} />
+              <InfoRow label="Mobile" value={user.mobile || 'N/A'} />
+              <InfoRow label="Plan Name" value={user.subscriptionPlan} />
+              <InfoRow label="Status" value={<SubscriptionStatus plan={user.subscriptionPlan} />} />
+              <InfoRow label="Credits" value={<CreditsDisplay plan={user.subscriptionPlan} credits={user.credits} />} />
               {user.isProUser && user.subscriptionEndDate && (
-                <tr>
-                  <td className={`label ${isDarkMode ? 'dark' : 'light'}`}>Valid Until:</td>
-                  <td className={`value ${isDarkMode ? 'dark' : 'light'}`}>
-                    {new Date(user.subscriptionEndDate).toLocaleDateString()}
-                  </td>
-                </tr>
+                <InfoRow label="Valid Until" value={user.subscriptionEndDate.toLocaleDateString()} />
               )}
             </tbody>
           </table>
-          {user.subscriptionPlan !== 'FREE' && (
-            <div style={{ marginTop: 24 }}>
-              <button
-                className="plan-btn-new"
-                style={{ 
-                  background: '#ef4444', 
-                  color: '#fff', 
-                  width: '100%',
-                  opacity: cancelLoading ? 0.7 : 1,
-                  cursor: cancelLoading ? 'not-allowed' : 'pointer'
-                }}
-                onClick={() => setShowCancelWarning(true)}
-                disabled={cancelLoading}
-              >
-                {cancelLoading ? 'Processing...' : 'Cancel Subscription'}
-              </button>
+          
+          {user.isProUser && (
+            <div className="card-footer">
+              <CancelSubscription onCancel={handleCancelSubscription} loading={cancelLoading} isDarkMode={isDarkMode} />
             </div>
           )}
-          {/* Confirmation modal */}
-          {showCancelWarning && (
-            <div style={{
-              marginTop: 16,
-              padding: 16,
-              background: isDarkMode ? '#2f333b' : '#fffbe6',
-              color: isDarkMode ? '#fff' : '#b45309',
-              borderRadius: 8,
-              border: `1px solid ${isDarkMode ? '#ef4444' : '#fbbf24'}`
-            }}>
-              <strong>Warning:</strong> Are you sure you want to cancel your Pro subscription? You’ll lose all features immediately.
-              <div style={{ marginTop: 12, display: 'flex', gap: 12 }}>
-                <button
-                  className="plan-btn-new"
-                  style={{ background: '#ef4444', color: '#fff', flex: 1 }}
-                  onClick={handleCancelSubscription}
-                  disabled={cancelLoading}
-                >
-                  {cancelLoading ? 'Cancelling...' : 'Confirm Cancel'}
-                </button>
-                <button
-                  className="plan-btn-new"
-                  style={{ background: '#e5e7eb', color: '#222', flex: 1 }}
-                  onClick={() => setShowCancelWarning(false)}
-                  disabled={cancelLoading}
-                >
-                  Keep Subscription
-                </button>
-              </div>
-            </div>
-          )}
-          {/* Show cancellation message */}
-          {cancelMsg && (
-            <div style={{
-              marginTop: 12,
-              color: cancelMsg.includes('success') ? '#16a34a' : '#ef4444'
-            }}>
-              {cancelMsg}
+          
+          {cancelMsg.text && (
+            <div className={`status-message ${cancelMsg.type}`}>
+              {cancelMsg.text}
             </div>
           )}
         </div>

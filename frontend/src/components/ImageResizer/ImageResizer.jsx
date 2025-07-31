@@ -87,6 +87,36 @@ const ImageResizer = () => {
     setIsProcessing(true);
     setError('');
     try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('You must be logged in to use this feature');
+      }
+
+      const headers = {
+        'Authorization': `Bearer ${token}`
+      };
+
+      // First, try to deduct credits
+      try {
+        const deductResponse = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/tools/deduct-credits`, {
+          method: 'POST',
+          headers
+        });
+
+        if (!deductResponse.ok) {
+          const errorData = await deductResponse.json();
+          if (deductResponse.status === 403) {
+            setIsPaymentModalOpen(true);
+          }
+          throw new Error(errorData.message || 'Failed to process credits');
+        }
+
+        // Trigger UI update for credits
+        window.dispatchEvent(new Event('authChange'));
+      } catch (deductError) {
+        throw new Error(deductError.message || 'Failed to process credits. Please try again.');
+      }
+
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d');
       const img = new Image();
@@ -120,6 +150,11 @@ const ImageResizer = () => {
     }
   };
 
+  const handlePaymentSuccess = () => {
+    setIsPaymentModalOpen(false);
+    resizeImage();
+  };
+
   const downloadImage = () => {
     if (!downloadUrl) return;
     
@@ -149,7 +184,7 @@ const ImageResizer = () => {
       <PaymentModal
         isOpen={isPaymentModalOpen}
         onClose={() => setIsPaymentModalOpen(false)}
-        onPaymentSuccess={() => setIsPaymentModalOpen(false)}
+        onPaymentSuccess={handlePaymentSuccess}
       />
       {error && (
         <div style={{ background: '#ffeaea', color: '#b91c1c', padding: '1rem', borderRadius: 8, marginBottom: 16, textAlign: 'center', fontWeight: 600 }}>

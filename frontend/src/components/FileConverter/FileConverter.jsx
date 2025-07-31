@@ -95,6 +95,35 @@ const FileConverter = () => {
 
     try {
       const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('You must be logged in to use this feature');
+      }
+
+      const headers = {
+        'Authorization': `Bearer ${token}`
+      };
+
+      // First, try to deduct credits
+      try {
+        const deductResponse = await fetch(`${API_BASE_URL}/tools/deduct-credits`, {
+          method: 'POST',
+          headers
+        });
+
+        if (!deductResponse.ok) {
+          const errorData = await deductResponse.json();
+          if (deductResponse.status === 403) {
+            setIsPaymentModalOpen(true);
+          }
+          throw new Error(errorData.message || 'Failed to process credits');
+        }
+
+        // Trigger UI update for credits
+        window.dispatchEvent(new Event('authChange'));
+      } catch (deductError) {
+        throw new Error(deductError.message || 'Failed to process credits. Please try again.');
+      }
+
       const formData = new FormData();
       formData.append('file', selectedFile);
       formData.append('targetFormat', targetFormat);

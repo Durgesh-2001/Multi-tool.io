@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import './AINumberPredictor.css';
+import PaymentModal from '../PaymentModal/PaymentModal';
 
 const API_BASE_URL = `${import.meta.env.VITE_BACKEND_URL}/api`;
 
@@ -25,6 +26,7 @@ const AINumberPredictor = () => {
   const [chartValue, setChartValue] = useState(0);
   const [showMatrix, setShowMatrix] = useState(false);
   const [inputLocked, setInputLocked] = useState(false);
+  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const chartInterval = useRef(null);
   const stepTimeout = useRef(null);
 
@@ -50,12 +52,40 @@ const AINumberPredictor = () => {
     setInputLocked(true);
 
     try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('You must be logged in to use this feature');
+      }
+
+      const headers = {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      };
+
+      // First, try to deduct credits
+      try {
+        const deductResponse = await fetch(`${API_BASE_URL}/tools/deduct-credits`, {
+          method: 'POST',
+          headers
+        });
+
+        if (!deductResponse.ok) {
+          const errorData = await deductResponse.json();
+          if (deductResponse.status === 403) {
+            setIsPaymentModalOpen(true);
+          }
+          throw new Error(errorData.message || 'Failed to process credits');
+        }
+
+        // Trigger UI update for credits
+        window.dispatchEvent(new Event('authChange'));
+      } catch (deductError) {
+        throw new Error(deductError.message || 'Failed to process credits. Please try again.');
+      }
+
       const res = await fetch(`${API_BASE_URL}/tools/ai-number-predictor`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        },
+        headers,
         body: JSON.stringify({ guess: Number(guess) })
       });
       if (!res.ok) {
@@ -153,8 +183,18 @@ const AINumberPredictor = () => {
     </div>
   );
 
+  const handlePaymentSuccess = () => {
+    setIsPaymentModalOpen(false);
+    handleGuess({ preventDefault: () => {} });
+  };
+
   return (
     <div className="ai-number-predictor-card enhanced">
+      <PaymentModal
+        isOpen={isPaymentModalOpen}
+        onClose={() => setIsPaymentModalOpen(false)}
+        onPaymentSuccess={handlePaymentSuccess}
+      />
       <div className="ai-number-predictor-header">
         <span className="ai-number-predictor-icon">🔮</span>
         <h2 className="ai-number-predictor-title">AI Number Predictor</h2>

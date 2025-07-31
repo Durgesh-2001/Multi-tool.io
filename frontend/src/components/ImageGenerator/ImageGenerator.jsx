@@ -116,6 +116,33 @@ const ImageGenerator = () => {
 
     try {
       const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('You must be logged in to use this feature');
+      }
+
+      // First, try to deduct credits
+      try {
+        const deductResponse = await fetch(`${API_BASE_URL}/tools/deduct-credits`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        if (!deductResponse.ok) {
+          const errorData = await deductResponse.json();
+          if (deductResponse.status === 403) {
+            setIsPaymentModalOpen(true);
+          }
+          throw new Error(errorData.message || 'Failed to process credits');
+        }
+
+        // Trigger UI update for credits
+        window.dispatchEvent(new Event('authChange'));
+      } catch (deductError) {
+        throw new Error(deductError.message || 'Failed to process credits. Please try again.');
+      }
+
       const response = await axios.post(`${API_BASE_URL}/imagegen/generate`, {
         prompt: prompt.trim(),
         option: selectedOption

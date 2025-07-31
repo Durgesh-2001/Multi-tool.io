@@ -4,8 +4,8 @@
   "description": "Multi-Tool.io Backend API",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
-    "server": "nodemon server.js",
+    "start": "cross-env NODE_ENV=production node server.js",
+    "server": "cross-env NODE_ENV=development nodemon server.js",
     "reset": "if exist node_modules rmdir /s /q node_modules && if exist package-lock.json del package-lock.json && npm install",
     "clean": "rimraf node_modules package-lock.json",
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -23,6 +23,7 @@
     "@distube/ytdl-core": "^4.16.12",
     "bcryptjs": "^3.0.2",
     "cors": "^2.8.5",
+    "cross-env": "^10.0.0",
     "crypto": "^1.0.1",
     "docx": "^8.5.0",
     "docx-pdf": "^0.0.1",

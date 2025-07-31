@@ -74,6 +74,24 @@ const toolData = [
         progress: '30%',
         eta: '2026',
     },
+    {
+        id: 'voice-cloner',
+        title: 'Voice Cloner',
+        description: 'Clone and modify voices using advanced AI technology',
+        icon: '🎤',
+        available: false,
+        progress: '20%',
+        eta: '2026',
+    },
+    {
+        id: 'code-generator',
+        title: 'Code Generator',
+        description: 'Generate code from natural language descriptions using AI assistance',
+        icon: '💻',
+        available: false,
+        progress: '10%',
+        eta: '2026',
+    },
 ];
 
 // --- Production Enhancement: Componentization ---

@@ -7,6 +7,45 @@ const accountSid = process.env.TWILIO_ACCOUNT_SID;
 const authToken = process.env.TWILIO_AUTH_TOKEN;
 const client = twilio(accountSid, authToken);
 
+export const deductCredits = async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id);
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'User not found' });
+        }
+
+        // Check if user is PRO - they don't need credit deduction
+        if (user.isProUser) {
+            return res.json({ success: true, credits: user.credits, message: 'Pro user - no credits deducted' });
+        }
+
+        // Check if user has enough credits
+        if (user.credits < 50) {
+            return res.status(403).json({
+                success: false,
+                message: 'Insufficient credits. Please upgrade to a Pro plan to continue.',
+                credits: user.credits
+            });
+        }
+
+        // Deduct credits and save
+        user.credits -= 50;
+        await user.save();
+
+        return res.json({
+            success: true,
+            credits: user.credits,
+            message: 'Credits deducted successfully'
+        });
+    } catch (error) {
+        console.error('Credit deduction error:', error);
+        return res.status(500).json({
+            success: false,
+            message: 'Error deducting credits'
+        });
+    }
+};
+
 // Send OTP
 export const sendOTP = async (req, res) => {
   try {
