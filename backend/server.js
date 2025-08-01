@@ -25,7 +25,7 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 const allowedOrigins = [
-  'https://multi-tooldot-io.vercel.app',
+  'https://multi-tool-io.vercel.app',
   'http://localhost:5173',
   'http://localhost:5174'
 ];
