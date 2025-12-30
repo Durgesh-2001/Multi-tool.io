@@ -1,7 +1,5 @@
 import sun_icon from './sun_icon.png'
 import moon_icon from './moon_icon.png'
-import app_store from './app_store.png'
-import play_store from './play_store.png'
 import linkedin_icon from './linkedin_icon.png'
 import instagram_icon from './instagram_icon.png'
 import twitter_icon from './twitter_icon.png'
@@ -23,8 +21,6 @@ import voiceGif from '../assets/Gifs/voice-scan.gif';
 import codeGif from '../assets/Gifs/coding.gif';
 
 export const assets = {
-    app_store,
-    play_store,
     linkedin_icon,
     instagram_icon,
     twitter_icon,
